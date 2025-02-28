@@ -7,6 +7,12 @@
 *.o
 *.obj
 
+# vscode
+.vscode/
+
+# cmake-build
+build/
+
 # Precompiled Headers
 *.gch
 *.pch
