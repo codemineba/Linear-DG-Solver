@@ -5,8 +5,8 @@
 #include <cmath>
 #include <cstring> 
 #include <algorithm>
-#include "TriangleMesh.h"
-#include "GeometryUtils.h"
+#include "mesh_structure/TriangleMesh.h"
+#include "SciCalUtils/GeometryUtils.h"
 
 // 定义宏
 #define GAMMA 1.4  // 绝热系数

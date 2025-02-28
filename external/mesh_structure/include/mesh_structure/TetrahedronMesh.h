@@ -1,7 +1,3 @@
-//
-// Created by 27966 on 2023/8/25.
-//
-
 #ifndef MESH_STRUCTURE_TEXT_TETRAHEDRONMESH_H
 #define MESH_STRUCTURE_TEXT_TETRAHEDRONMESH_H
 
@@ -13,7 +9,6 @@
 #include <tuple>
 #include <cassert>
 #include <algorithm>
-#include "GeometryUtils.h"
 
 using namespace std;
 

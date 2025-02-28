@@ -1,4 +1,4 @@
-#include "TetrahedronMesh.h"
+#include "mesh_structure/TetrahedronMesh.h"
 
 // 标准C++不提供去除首尾空格的库函数，但利用string也可以实现此功能
 string TetrahedronMesh::trim(string s) {

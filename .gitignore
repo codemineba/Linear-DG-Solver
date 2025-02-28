@@ -36,3 +36,7 @@ build/
 *.exe
 *.out
 *.app
+
+# mesh file of mesh_path
+mesh/*.off
+mesh/*.msh

@@ -8,7 +8,6 @@
 #include <iomanip>
 #include <tuple>
 #include <assert.h>
-#include "GeometryUtils.h"
 
 class TriangleMesh {  // 三角形的点和边和面的索引都是从0开始
 

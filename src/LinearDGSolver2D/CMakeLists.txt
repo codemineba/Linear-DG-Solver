@@ -1,6 +1,4 @@
-include_directories(${CMAKE_SOURCE_DIR}/include/mesh_structure)
 include_directories(${CMAKE_SOURCE_DIR}/include/LinearDGSolver2D)
-include_directories(${CMAKE_SOURCE_DIR}/include/Utils)
 
 # 2D_LDG_CB
 add_library(LinearDGSolver2DCycleBoundary
@@ -14,3 +12,7 @@ add_library(LinearDGSolver2DCavityCylinderFlow
     LinearDGSolver2DCavityObstacleFlow.cpp
     LinearDGSolver2DCavityCylinderFlow.cpp
 )
+
+# 🔗 链接外部库
+target_link_libraries(LinearDGSolver2DCycleBoundary PRIVATE GeometryUtils triangle_mesh)
+target_link_libraries(LinearDGSolver2DCavityCylinderFlow PRIVATE GeometryUtils triangle_mesh)

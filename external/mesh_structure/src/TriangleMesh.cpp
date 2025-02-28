@@ -1,4 +1,4 @@
-#include "TriangleMesh.h"
+#include "mesh_structure/TriangleMesh.h"
 
 
 // 标准C++不提供去除首尾空格的库函数，但利用string也可以实现此功能
@@ -108,7 +108,10 @@ void TriangleMesh::check_point_order(unsigned long ik, double* normal) {
     double u[3] = {x2-x1, y2-y1, z2-z1};
     double v[3] = {x3-x1, y3-y1, z3-z1};
     
-    cross(u, v, normal);
+    // 计算normal叉积
+    normal[0] = u[1] * v[2] - u[2] * v[1];
+    normal[1] = u[2] * v[0] - u[0] * v[2];
+    normal[2] = u[0] * v[1] - u[1] * v[0];
 }
 
 
