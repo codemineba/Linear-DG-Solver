@@ -49,7 +49,7 @@ void cross(const double u[3], const double v[3], double result[3]){
     result[2] = u[0] * v[1] - u[1] * v[0];
 }
 
-// 计算三角形面积 (带方向)
+// 计算二维三角形面积 (带方向)
 double directed_2D_triangle_area(double* v0, double* v1, double* v2) {
     double x0 = v0[0], y0 = v0[1];
     double x1 = v1[0], y1 = v1[1];
@@ -61,6 +61,20 @@ double directed_2D_triangle_area(double* v0, double* v1, double* v2) {
         x1 * (y2 - y0) +
         x2 * (y0 - y1)
     );
+    return area; // 返回带方向的面积
+}
+
+// 计算三维三角形面积 (带方向)
+double directed_3D_triangle_area(double* v0, double* v1, double* v2) {
+    // 构造向量
+    double AB[3] = {v1[0]-v0[0], v1[1]-v0[1], v1[2]-v0[2]};
+    double AC[3] = {v2[0]-v0[0], v2[1]-v0[1], v2[2]-v0[2]};
+
+    // 叉积的模长的一半即为空间三角形的面积
+    double normal[3]; 
+    cross(AB, AC, normal);
+    double area = l2_norm(normal, 3)/2;
+
     return area; // 返回带方向的面积
 }
 

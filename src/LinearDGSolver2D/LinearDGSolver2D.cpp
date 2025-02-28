@@ -95,7 +95,7 @@ void LinearDGSolver_2D::flux(double* u, double f[2][4]){
     f[0][0] = rho*v1,        f[1][0] = rho*v2,
     f[0][1] = rho*v1*v1+p,   f[1][1] = rho*v1*v2,
     f[0][2] = rho*v1*v2,     f[1][2] = rho*v2*v2+p,
-    f[0][3] = (E+p)*v1, f[1][3] = (E+p)*v2;
+    f[0][3] = (E+p)*v1,      f[1][3] = (E+p)*v2;
     
 }
 

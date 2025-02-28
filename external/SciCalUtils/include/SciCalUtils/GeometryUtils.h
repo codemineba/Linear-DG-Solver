@@ -23,8 +23,11 @@ double euclidean_distance(double* a, double* b, unsigned long size);
 // 计算两个向量的叉积
 void cross(const double u[3], const double v[3], double result[3]);
 
-// 计算三角形面积 (带方向)
+// 计算二维三角形面积 (带方向)
 double directed_2D_triangle_area(double* v0, double* v1, double* v2);
+
+// 计算三维三角形面积 (带方向)
+double directed_3D_triangle_area(double* v0, double* v1, double* v2);
 
 // 计算三角形关于顶点坐标的方向面积梯度
 void directed_2D_triangle_area_gradient(double* v0, double* v1, double* v2, int idx, double* area_v);

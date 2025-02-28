@@ -94,7 +94,7 @@ public:
         for(unsigned long i=0; i<nVertex; i++){
             rho[i] = 0.0;
         }
-        computeElementProperties();    // 计算单元属性 (包括: 中点,高斯点,边长,周长,面积)
+        computeElementProperties();    // 计算单元属性 (包括: 内部求积点,边界求积点,面积,表面积,体积)
         computeOuterNormal();          // 计算外法向量
         computeBasisOnNodes();         // 计算基函数在相关节点上的值
         computeBoundaryInfo();         // 计算边界信息
@@ -141,7 +141,7 @@ public:
     // 数值通量
     void numerical_flux(double* u1, double *u2, double *normal, double* f);
 
-    // 计算单元属性 (包括: 中点,高斯点,边长,周长,面积)
+    // 计算单元属性  (包括: 内部求积点,边界求积点,面积,表面积,体积)
     void computeElementProperties();
 
     // 计算基函数在相关节点上的值

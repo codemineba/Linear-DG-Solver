@@ -54,7 +54,7 @@ void LinearDGSolver_3D::phi(unsigned long ik, double x, double y, double z, doub
     }
 }
 
-// 计算通量, 返回3x4的矩阵f
+// 计算通量, 返回3x5的矩阵f
 void LinearDGSolver_3D::flux(double* u, double f[3][5]){
 
     double rho=u[0];   // 密度
@@ -69,7 +69,7 @@ void LinearDGSolver_3D::flux(double* u, double f[3][5]){
     f[0][1] = rho*v1*v1+p,   f[1][1] = rho*v1*v2,     f[2][1] = rho*v1*v3,
     f[0][2] = rho*v2*v1,     f[1][2] = rho*v2*v2+p,   f[2][2] = rho*v2*v3, 
     f[0][3] = rho*v3*v1,     f[1][3] = rho*v3*v2,     f[2][3] = rho*v3*v3+p,
-    f[0][4] = (E+p)*v1, f[1][4] = (E+p)*v2, f[2][4] = (E+p)*v3;
+    f[0][4] = (E+p)*v1,      f[1][4] = (E+p)*v2,      f[2][4] = (E+p)*v3;
     
 }
 
@@ -176,8 +176,8 @@ void LinearDGSolver_3D::computeElementProperties(){
                 barx_[2][nBarx_*i+j]+=z[faceidx[k][i]]*bareta[j][k];
             }
         }
-        double v0[2]={x[faceidx[0][i]], y[faceidx[0][i]]}, v1[2]={x[faceidx[1][i]], y[faceidx[1][i]]}, v2[2]={x[faceidx[2][i]], y[faceidx[2][i]]};
-        face_area_[i]=abs(directed_2D_triangle_area(v0, v1, v2));
+        double v0[3]={x[faceidx[0][i]], y[faceidx[0][i]], z[faceidx[0][i]]}, v1[3]={x[faceidx[1][i]], y[faceidx[1][i]], z[faceidx[1][i]]}, v2[3]={x[faceidx[2][i]], y[faceidx[2][i]], z[faceidx[2][i]]};
+        face_area_[i]=abs(directed_3D_triangle_area(v0, v1, v2));
     }
 
     // 计算表面积
@@ -292,7 +292,7 @@ void LinearDGSolver_3D::computeInitialData() {
 
     // 初值条件
     computeInitialCondition(dof_, hatx_[0], hatx_[1], hatx_[2], u0_);
-    // std::cout<<u0_[0][0]<<' '<<u0_[1][2]<<' '<<u0_[2][3]<<std::endl;
+
     // 赋值给u_
     for (unsigned long i = 0; i<nElement ; i++){
         for (int j = 0; j<nPhi_; j++) {
@@ -507,7 +507,6 @@ void LinearDGSolver_3D::computeTimeDiscretization(double total_time, double* sav
             u_now[m][i] = u_[m][i];
         }
     }
-    // std::cout<<u_[0][0]<<' '<<u_[1][2]<<' '<<u_[2][3]<<std::endl;
 
     SynchronizationUpdate(u_now);  // 同步更新    
 
@@ -654,7 +653,6 @@ void LinearDGSolver_3D::NumericalSolutionOnVertex(double** u, double** var){
 
 // 用于画图
 void LinearDGSolver_3D::SynchronizationUpdate(double** u){
-
     NumericalSolutionOnVertex(u, 0, rho);
 }
 

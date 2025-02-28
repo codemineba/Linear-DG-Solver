@@ -1,7 +1,6 @@
 #include <iostream>
 #include <filesystem> 
 #include "LinearDGSolver3DCycleBoundary.h"
-#include "mesh_structure/TetrahedronMesh.h"
 
 using namespace std;
 
@@ -25,10 +24,10 @@ int main() {
 
     dle3Solver->computeTimeDiscretization(total_time, save_time, save_time_num);
 
-    // string filename0 = "0s_result.dat";
+    string filename0 = "0s_result.dat";
     // string filename1 = "1s_result.dat";                                                                                        
     // string filename2 = "2s_result.dat";
-    // dle3Solver->outputTecPlotDataFile(write_path + filename0, 0);
+    dle3Solver->outputTecPlotDataFile(write_path + filename0, 0);
     // dle3Solver->outputTecPlotDataFile(write_path + filename1, 1);
     // dle3Solver->outputTecPlotDataFile(write_path + filename2, 2);
 

@@ -40,3 +40,12 @@ build/
 # mesh file of mesh_path
 mesh/*.off
 mesh/*.msh
+
+# latex
+doc/**
+!doc/DG_2D/images/
+!doc/DG_3D/images/
+!doc/DG_2D/*.pdf
+!doc/DG_3D/*.pdf
+!doc/DG_2D/*.tex
+!doc/DG_3D/*.tex

@@ -40,5 +40,4 @@ public:
 };
 
 
-
 #endif // _LINEAR_DG_SOLVER_2D_CYCLE_BOUNDARY_H_
