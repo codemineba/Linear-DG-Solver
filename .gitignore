@@ -42,7 +42,8 @@ mesh/*.off
 mesh/*.msh
 
 # latex
-doc/**
+doc/DG_2D/
+doc/DG_3D/
 !doc/DG_2D/images/
 !doc/DG_3D/images/
 !doc/DG_2D/*.pdf
