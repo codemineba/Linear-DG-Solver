@@ -39,14 +39,13 @@ protected:
     double *edge_len_;          // 边的长度，用于计算外法向量
     double *perimeter_;         // 单元周长
     double *area_;              // 单元面积
-    unsigned long *boundary_;   // 储存边界索引
     double *rho;
 
 
     unsigned long nElement;     // 单元数
     unsigned long nVertex;      // 顶点数
     unsigned long nEdge;        // 边数
-    unsigned long nBoundry;     // 边界数
+    unsigned long nBoundary;     // 边界数
     
     double timeInterval_;          // 时间步长    
     double timePoint_;             // 实时时刻 
@@ -69,6 +68,7 @@ public:
         nElement = mesh->getNTriangle();
         nVertex = mesh->getNVertex();
         nEdge = mesh->getNEdge();
+        nBoundary = mesh->getNBoundary();
         dof_=nElement*nPhi_;
 
         // 数组初始化
@@ -94,7 +94,6 @@ public:
         computeElementProperties();    // 计算单元属性 (包括: 中点,高斯点,边长,周长,面积)
         computeOuterNormal();          // 计算外法向量
         computeBasisOnNodes();         // 计算基函数在相关节点上的值
-        computeBoundaryInfo();         // 计算边界信息
 
     }
     
@@ -103,7 +102,6 @@ public:
         delete[] area_;
         delete[] edge_len_;
         delete[] perimeter_;
-        delete[] boundary_;
         for (int i=0; i<dim_; i++){
             delete[] hatx_[i];
             delete[] barx_[i];
@@ -143,9 +141,6 @@ public:
     
     // 计算外法向量
     void computeOuterNormal();
-
-    // 计算边界信息
-    void computeBoundaryInfo();
 
     // 计算初始状态
     void computeInitialData();

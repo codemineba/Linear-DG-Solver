@@ -185,6 +185,7 @@ void TriangleMesh::collect_edges(){
         edges_[3][j] = std::get<3>(t);
 
     }
+    // order of edge in 2 neighboring triangle
     for (int i = 0; i < 2; i++){
         edge_order_in_tri_[i] = new unsigned long[nEdge];
         for(unsigned long j=0; j<nEdge; j++) {edge_order_in_tri_[i][j] = 3;}
@@ -196,6 +197,18 @@ void TriangleMesh::collect_edges(){
             if (tri_edge_conn_[i][ik_] == j) {edge_order_in_tri_[1][j] = i;}
         } 
     }
+    // get boundary
+    unsigned long tempboundary[nEdge];
+    for(unsigned long i=0; i < nEdge; i++){
+        if(edges_[3][i] == nTriangle+1){
+            tempboundary[nBoundary] = i;
+            nBoundary++;
+        }                
+    }
+    boundary_ = new unsigned long[nBoundary];
+    for(unsigned long i=0; i < nBoundary; i++){
+        boundary_[i] = tempboundary[i]; 
+    }  
 }
 
 

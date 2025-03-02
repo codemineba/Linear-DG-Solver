@@ -15,10 +15,12 @@ private:
     unsigned long nVertex;
     unsigned long nEdge;
     unsigned long nTriangle;
+    unsigned long nBoundary;
 
     double *x_;
     double *y_;
     double *z_;
+    unsigned long *boundary_;
 
     unsigned long *tri_[3];
     unsigned long *tri_edge_conn_[3];
@@ -36,10 +38,12 @@ public:
     TriangleMesh(){
         nVertex=0;
         nTriangle=0;
+        nBoundary=0;
 
         x_=nullptr;
         y_=nullptr;
         z_=nullptr;
+        boundary_=nullptr;
 
         tri_[0]=tri_[1]=tri_[2]=nullptr;
         tri_edge_conn_[0]=tri_edge_conn_[1]=tri_edge_conn_[2]=nullptr;
@@ -52,6 +56,7 @@ public:
             delete []x_;
             delete []y_;
             delete []z_;
+            delete []boundary_;
             delete []tri_[0];
             delete []tri_[1];
             delete []tri_[2];
@@ -76,9 +81,11 @@ public:
     unsigned long getNVertex(){  return nVertex; }
     unsigned long getNEdge()  {  return nEdge;   }
     unsigned long getNTriangle() { return nTriangle; }
+    unsigned long getNBoundary() { return nBoundary; }
     double *x_coord(){  return x_; }
     double *y_coord(){  return y_; }
     double *z_coord(){  return z_; }
+    unsigned long *boundary() { return boundary_; }
 
     unsigned long **triangle()  { return tri_; }
     unsigned long **edge_info() { return edges_;}

@@ -262,27 +262,6 @@ void LinearDGSolver_3D::computeBasisOnNodes(){
     }
 }
 
-// 计算边界信息
-void LinearDGSolver_3D::computeBoundaryInfo(){
-
-    unsigned long ** faceidx=tetmesh_->face_info();
-    // 记录边界个数和边界的边索引
-    nBoundry = 0;
-    unsigned long tempboundry[nFace];
-    for(unsigned long i=0; i < nFace; i++){
-        if(faceidx[4][i] == nElement+1){
-            tempboundry[nBoundry] = i;
-            nBoundry++;
-        }                
-    }
-    boundary_ = new unsigned long[nBoundry];
-    for(unsigned long i=0; i < nBoundry; i++){
-        boundary_[i] = tempboundry[i]; 
-    }  
-    
-}
-
-
 
 // 计算初始状态
 void LinearDGSolver_3D::computeInitialData() {

@@ -5,6 +5,7 @@
 void LinearDGSolver_2D_CycleBoundary::computePeriodicBoundaryInfo(){
     double *x=trimesh_->x_coord();
     double *y=trimesh_->y_coord();
+    unsigned long *boundary = trimesh_->boundary();
     unsigned long ** edgeidx=trimesh_->edge_info();
     unsigned long** edge_order_in_tri = trimesh_->edge_order_in_tri();
 
@@ -16,37 +17,37 @@ void LinearDGSolver_2D_CycleBoundary::computePeriodicBoundaryInfo(){
     
     // 寻找边界的对应边的索引 （周期边界） 
     // 记录周期边界信息(要求网格点在边界处一致分布)
-    for(unsigned long i=0; i < nBoundry; i++){
+    for(unsigned long i=0; i < nBoundary; i++){
         // 该边的两个点
-        unsigned long ie_p1 = edgeidx[0][boundary_[i]];
-        unsigned long ie_p2 = edgeidx[1][boundary_[i]];
+        unsigned long ie_p1 = edgeidx[0][boundary[i]];
+        unsigned long ie_p2 = edgeidx[1][boundary[i]];
         double edge1[2][2]={{x[ie_p1], y[ie_p1]}, {x[ie_p2], y[ie_p2]}};
 
-        for(unsigned long j=0; j < nBoundry; j++){
+        for(unsigned long j=0; j < nBoundary; j++){
             // 该边的两个点
-            unsigned long je_p1 = edgeidx[0][boundary_[j]];
-            unsigned long je_p2 = edgeidx[1][boundary_[j]];
+            unsigned long je_p1 = edgeidx[0][boundary[j]];
+            unsigned long je_p2 = edgeidx[1][boundary[j]];
             double edge2[2][2]={{x[je_p1], y[je_p1]}, {x[je_p2], y[je_p2]}};
 
             if(is_edge_shift_from(edge1, edge2)){  // 符合平移
-                periodic_boundary_[boundary_[i]]= boundary_[j]; 
+                periodic_boundary_[boundary[i]]= boundary[j]; 
                 break;
             }
         }
     }
     // 调整周期边界之间高斯点的顺序 (确保计算边界上的数值通量时,高斯点位置能直接对应)
-    for(unsigned long i=0; i<nBoundry; i++){
+    for(unsigned long i=0; i<nBoundary; i++){
         // 边界上的两个高斯点
-        double v1[dim_] = {barx_[0][nBarx_*boundary_[i]], barx_[1][nBarx_*boundary_[i]]};
-        double v2[dim_] = {barx_[0][nBarx_*boundary_[i]+1], barx_[1][nBarx_*boundary_[i]+1]};
+        double v1[dim_] = {barx_[0][nBarx_*boundary[i]], barx_[1][nBarx_*boundary[i]]};
+        double v2[dim_] = {barx_[0][nBarx_*boundary[i]+1], barx_[1][nBarx_*boundary[i]+1]};
         if((is_almost_equal(v1[0], v2[0]) && (v1[1] > v2[1])) || // 关于y轴平行 规定高斯点从下往上排列(y轴正方向) 即y0 < y1
         (is_almost_equal(v1[1], v2[1]) && (v1[0] > v2[0])))      // 关于x轴平行 规定高斯点从左往右排列(x轴正方向) 即x0 < x1
         {  
             // 交换 v1 和 v2 的坐标 以及基函数的值
-            unsigned long ik = edgeidx[2][boundary_[i]]; 
-            unsigned long order = edge_order_in_tri[0][boundary_[i]];
-            std::swap(barx_[0][nBarx_ * boundary_[i]], barx_[0][nBarx_ * boundary_[i] + 1]);
-            std::swap(barx_[1][nBarx_ * boundary_[i]], barx_[1][nBarx_ * boundary_[i] + 1]);
+            unsigned long ik = edgeidx[2][boundary[i]]; 
+            unsigned long order = edge_order_in_tri[0][boundary[i]];
+            std::swap(barx_[0][nBarx_ * boundary[i]], barx_[0][nBarx_ * boundary[i] + 1]);
+            std::swap(barx_[1][nBarx_ * boundary[i]], barx_[1][nBarx_ * boundary[i] + 1]);
             std::swap(phi_barx_[0][nBarx_*(nSide_*ik+order)], phi_barx_[0][nBarx_*(nSide_*ik+order)+1]);  
             std::swap(phi_barx_[1][nBarx_*(nSide_*ik+order)], phi_barx_[1][nBarx_*(nSide_*ik+order)+1]);  
             std::swap(phi_barx_[2][nBarx_*(nSide_*ik+order)], phi_barx_[2][nBarx_*(nSide_*ik+order)+1]);  

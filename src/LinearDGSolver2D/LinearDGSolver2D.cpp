@@ -220,26 +220,6 @@ void LinearDGSolver_2D::computeBasisOnNodes(){
     }
 }
 
-// 计算边界信息
-void LinearDGSolver_2D::computeBoundaryInfo(){
-
-    unsigned long ** edgeidx=trimesh_->edge_info();
-    // 记录边界个数和边界的边索引
-    nBoundry = 0;
-    unsigned long tempboundry[nEdge];
-    for(unsigned long i=0; i < nEdge; i++){
-        if(edgeidx[3][i] == nElement+1){
-            tempboundry[nBoundry] = i;
-            nBoundry++;
-        }                
-    }
-    boundary_ = new unsigned long[nBoundry];
-    for(unsigned long i=0; i < nBoundry; i++){
-        boundary_[i] = tempboundry[i]; 
-    }  
-    
-}
-
 
 
 // 计算初始状态

@@ -6,6 +6,7 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
     double *x=tetmesh_->x_coord();
     double *y=tetmesh_->y_coord();
     double *z=tetmesh_->z_coord();
+    unsigned long *boundary=tetmesh_->boundary();
     unsigned long ** faceidx=tetmesh_->face_info();
     unsigned long** face_order_in_tet = tetmesh_->face_order_in_tet();
 
@@ -17,32 +18,32 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
     
     // 寻找边界的对应面的索引 （周期边界） 
     // 记录周期边界信息(要求网格点在边界处一致分布)
-    for(unsigned long i=0; i < nBoundry; i++){
+    for(unsigned long i=0; i < nBoundary; i++){
         // 该三角形的三个点
-        unsigned long itri_p1 = faceidx[0][boundary_[i]];
-        unsigned long itri_p2 = faceidx[1][boundary_[i]];
-        unsigned long itri_p3 = faceidx[2][boundary_[i]];
+        unsigned long itri_p1 = faceidx[0][boundary[i]];
+        unsigned long itri_p2 = faceidx[1][boundary[i]];
+        unsigned long itri_p3 = faceidx[2][boundary[i]];
         double tri1[3][3]={{x[itri_p1], y[itri_p1], z[itri_p1]}, {x[itri_p2], y[itri_p2], z[itri_p2]}, {x[itri_p3], y[itri_p3], z[itri_p3]}};
 
-        for(unsigned long j=0; j < nBoundry; j++){
+        for(unsigned long j=0; j < nBoundary; j++){
             // 该边的两个点
-            unsigned long jtri_p1 = faceidx[0][boundary_[j]];
-            unsigned long jtri_p2 = faceidx[1][boundary_[j]];
-            unsigned long jtri_p3 = faceidx[2][boundary_[j]];
+            unsigned long jtri_p1 = faceidx[0][boundary[j]];
+            unsigned long jtri_p2 = faceidx[1][boundary[j]];
+            unsigned long jtri_p3 = faceidx[2][boundary[j]];
             double tri2[3][3]={{x[jtri_p1], y[jtri_p1], z[jtri_p1]}, {x[jtri_p2], y[jtri_p2], z[jtri_p2]}, {x[jtri_p3], y[jtri_p3], z[jtri_p3]}};
 
             if(is_tri_shift_from(tri1, tri2)){  // 符合平移
-                periodic_boundary_[boundary_[i]]= boundary_[j]; 
+                periodic_boundary_[boundary[i]]= boundary[j]; 
                 break;
             }
         }
     }
     // 调整周期边界之间边界积分点的顺序 (确保计算边界上的数值通量时,边界求积点位置能直接对应)
-    for(unsigned long i=0; i<nBoundry; i++){
+    for(unsigned long i=0; i<nBoundary; i++){
         // 边界上的三个积分点
-        double v1[dim_] = {barx_[0][nBarx_*boundary_[i]], barx_[1][nBarx_*boundary_[i]], barx_[2][nBarx_*boundary_[i]]};
-        double v2[dim_] = {barx_[0][nBarx_*boundary_[i]+1], barx_[1][nBarx_*boundary_[i]+1], barx_[2][nBarx_*boundary_[i]+1]};
-        double v3[dim_] = {barx_[0][nBarx_*boundary_[i]+2], barx_[1][nBarx_*boundary_[i]+2], barx_[2][nBarx_*boundary_[i]+2]};
+        double v1[dim_] = {barx_[0][nBarx_*boundary[i]], barx_[1][nBarx_*boundary[i]], barx_[2][nBarx_*boundary[i]]};
+        double v2[dim_] = {barx_[0][nBarx_*boundary[i]+1], barx_[1][nBarx_*boundary[i]+1], barx_[2][nBarx_*boundary[i]+1]};
+        double v3[dim_] = {barx_[0][nBarx_*boundary[i]+2], barx_[1][nBarx_*boundary[i]+2], barx_[2][nBarx_*boundary[i]+2]};
 
 
         int idx = -1;  // 初始化索引
@@ -63,8 +64,8 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
             bubble_sort_with_indices(arr, indices, 3);
 
             // 根据排序后的 indices 数组，重新组织对应的数据
-            unsigned long ik = faceidx[3][boundary_[i]];
-            unsigned long order = face_order_in_tet[0][boundary_[i]];
+            unsigned long ik = faceidx[3][boundary[i]];
+            unsigned long order = face_order_in_tet[0][boundary[i]];
 
             // 临时变量存储排序后的 barx_ 和 phi_barx_ 的值
             double temp_barx[dim_][nBarx_];  
@@ -74,7 +75,7 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
             for (int j = 0; j < nBarx_; ++j) {  // 遍历每个点
                 unsigned long original_index = indices[j];  // 排序前的位置索引
                 for (int n = 0; n < dim_; ++n) {  
-                    temp_barx[n][j] = barx_[n][nBarx_ * boundary_[i] + original_index];
+                    temp_barx[n][j] = barx_[n][nBarx_ * boundary[i] + original_index];
                 }
                 for (int n = 0; n < nPhi_; ++n) { 
                     temp_phi_barx[n][j] = phi_barx_[n][nBarx_ * (nSide_*ik+order) + original_index];
@@ -84,7 +85,7 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
             // 交换ik面的积分点的顺序
             for (int j = 0; j < nBarx_; ++j) {  // 遍历每个点
                 for (int n = 0; n < dim_; ++n) { 
-                    barx_[n][nBarx_ * boundary_[i] + j] = temp_barx[n][j];
+                    barx_[n][nBarx_ * boundary[i] + j] = temp_barx[n][j];
                 }
                 for (int n = 0; n < nPhi_; ++n) {
                     phi_barx_[n][nBarx_ * (nSide_*ik+order) + j] = temp_phi_barx[n][j];

@@ -41,14 +41,13 @@ protected:
     double *face_area_;         // 面的面积，用于计算外法向量
     double *sufacearea_;        // 单元表面积
     double *volume_;            // 单元体积 
-    unsigned long *boundary_;   // 储存边界索引
     double *rho;
 
 
     unsigned long nElement;     // 单元数
     unsigned long nVertex;      // 顶点数
     unsigned long nFace;        // 面数
-    unsigned long nBoundry;     // 边界数
+    unsigned long nBoundary;     // 边界数
     
     double timeInterval_;          // 时间步长    
     double timePoint_;             // 实时时刻 
@@ -71,6 +70,7 @@ public:
         nElement = mesh->getNTetrahedron();
         nVertex = mesh->getNVertex();
         nFace = mesh->getNFace();
+        nBoundary = mesh->getNBoundary();
         dof_=nElement*nPhi_;
 
         // 数组初始化
@@ -97,7 +97,6 @@ public:
         computeElementProperties();    // 计算单元属性 (包括: 内部求积点,边界求积点,面积,表面积,体积)
         computeOuterNormal();          // 计算外法向量
         computeBasisOnNodes();         // 计算基函数在相关节点上的值
-        computeBoundaryInfo();         // 计算边界信息
 
     }
     
@@ -106,7 +105,6 @@ public:
         delete[] volume_;
         delete[] face_area_;
         delete[] sufacearea_;
-        delete[] boundary_;
         for (int i=0; i<3; i++){
             delete[] hatx_[i];
             delete[] barx_[i];
@@ -149,9 +147,6 @@ public:
     
     // 计算外法向量
     void computeOuterNormal();
-
-    // 计算边界信息
-    void computeBoundaryInfo();
 
     // 计算初始状态
     void computeInitialData();

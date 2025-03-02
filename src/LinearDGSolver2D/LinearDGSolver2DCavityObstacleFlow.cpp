@@ -5,6 +5,7 @@
 void LinearDGSolver_2D_CavityObstacleFlow::computeBoundaryType() {
     double *x=trimesh_->x_coord();
     double *y=trimesh_->y_coord();
+    unsigned long *boundary=trimesh_->boundary();
     unsigned long ** edgeidx=trimesh_->edge_info();
 
     // 判断网格是否为fang'qiang
@@ -15,8 +16,8 @@ void LinearDGSolver_2D_CavityObstacleFlow::computeBoundaryType() {
     }
     
     // 判断边界类型
-    for(unsigned long i=0; i < nBoundry; i++){
-        unsigned long idx_edge = boundary_[i];
+    for(unsigned long i=0; i < nBoundary; i++){
+        unsigned long idx_edge = boundary[i];
 
         // 该边的两个点
         unsigned long p1 = edgeidx[0][idx_edge];

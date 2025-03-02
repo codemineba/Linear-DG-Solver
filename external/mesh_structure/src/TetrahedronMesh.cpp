@@ -174,6 +174,7 @@ void TetrahedronMesh::collect_faces(){
         faces_[3][j]=std::get<3>(t);
         faces_[4][j]=std::get<4>(t);
     }
+    // order of edge in 2 neighboring tetrahedron
     for (int i = 0; i < 2; i++){
         face_order_in_tet_[i] = new unsigned long[nFace];
         for(unsigned long j=0; j<nFace; j++) {face_order_in_tet_[i][j] = 4;}
@@ -185,7 +186,18 @@ void TetrahedronMesh::collect_faces(){
             if (tet_face_conn_[i][ik_] == j) {face_order_in_tet_[1][j] = i;}
         } 
     }
-
+    // get boundary
+    unsigned long tempboundary[nFace];
+    for(unsigned long i=0; i < nFace; i++){
+        if(faces_[4][i] == nTetrahedron+1){
+            tempboundary[nBoundary] = i;
+            nBoundary++;
+        }                
+    }
+    boundary_ = new unsigned long[nBoundary];
+    for(unsigned long i=0; i < nBoundary; i++){
+        boundary_[i] = tempboundary[i]; 
+    }  
 }
 
 

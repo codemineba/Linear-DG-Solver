@@ -19,15 +19,17 @@ private:
     unsigned long nEdge;         // 边数
     unsigned long nFace;         // 面数
     unsigned long nTetrahedron;  // 四面体数
+    unsigned long nBoundary;     // 边界数
 
     double *x_;
     double *y_;
     double *z_;
+    unsigned long *boundary_;
 
     unsigned long *tet_[4];
     unsigned long *tet_face_conn_[4];
     unsigned long *faces_[5];  // index of 3 vertices and 2 neighboring tetrahedron for each edge
-    unsigned long *face_order_in_tet_[2];    // order of edge in 2 neighboring triangle
+    unsigned long *face_order_in_tet_[2];    // order of edge in 2 neighboring tetrahedron
 
 
     // 标准C++不提供去除首尾空格的库函数，但利用string也可以实现此功能
@@ -43,6 +45,7 @@ public:
         nEdge=0;
         nFace=0;
         nTetrahedron=0;
+        nBoundary=0;
 
         x_=nullptr;
         y_=nullptr;
@@ -59,6 +62,7 @@ public:
             delete []x_;
             delete []y_;
             delete []z_;
+            delete []boundary_;
             delete []tet_[0];
             delete []tet_[1];
             delete []tet_[2];
@@ -86,9 +90,11 @@ public:
     unsigned long getNVertex(){  return nVertex; }
     unsigned long getNFace(){  return nFace; }
     unsigned long getNTetrahedron() { return nTetrahedron; }
+    unsigned long getNBoundary() { return nBoundary; }
     double *x_coord(){  return x_; }
     double *y_coord(){  return y_; }
     double *z_coord(){  return z_; }
+    unsigned long *boundary(){ return boundary_; }
 
     unsigned long **tetrahedron()  { return tet_; }
     unsigned long **face_info() { return faces_; }
