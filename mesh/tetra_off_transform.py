@@ -26,4 +26,4 @@ def off_transform(file_name):
         f.close()
 
 
-off_transform('tetrahedronMesh0.2.msh')
+off_transform('tetrahedronMesh0.025.msh')

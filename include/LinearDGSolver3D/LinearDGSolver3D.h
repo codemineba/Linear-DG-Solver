@@ -10,6 +10,7 @@
 
 // 定义宏
 #define GAMMA 1.4  // 绝热系数
+#define CFL 0.3    // 条件数
 #define PRESSURE(E, rho, v) ((GAMMA - 1) * ((E) - 0.5 * (rho) * (v[0]*v[0] + v[1]*v[1]+v[2]*v[2])))  // 压强
 #define SOUND_SPEED(p, rho) (sqrt(GAMMA * p / rho))  // 声速
 

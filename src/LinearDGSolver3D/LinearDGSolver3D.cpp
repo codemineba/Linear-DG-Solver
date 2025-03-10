@@ -416,8 +416,6 @@ void LinearDGSolver_3D::computeSpaceDiscretization(double** u, double**f) {
 
 double LinearDGSolver_3D::computeTimeStep(double** u){
     
-    // 条件数
-    double CFL = 0.1;
     double dm[nElement]={0}; 
 
     for(unsigned long i=0; i<nElement; i++){

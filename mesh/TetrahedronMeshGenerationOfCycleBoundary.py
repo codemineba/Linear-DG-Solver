@@ -17,7 +17,7 @@ def generate_tetrahedral_mesh(filename):
     gmsh.model.occ.synchronize()
 
     # 在六个面上设置一致分布
-    divisions = 5  # 网格点划分数目，可调整
+    divisions = 81  # 网格点划分数目，可调整
 
     # 获取立方体的边并设置一致划分
     edges = gmsh.model.getEntities(dim=1)  # 获取所有 1D 实体（边）
@@ -45,4 +45,4 @@ def generate_tetrahedral_mesh(filename):
     gmsh.finalize()
 
 if __name__ == "__main__":
-    generate_tetrahedral_mesh("tetrahedronMesh.msh")
+    generate_tetrahedral_mesh("tetrahedronMesh0.025.msh")

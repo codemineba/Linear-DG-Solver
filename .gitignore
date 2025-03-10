@@ -16,6 +16,17 @@ external/
 # cmake-build
 build/
 
+# latex
+doc/DG_2D/*.aux
+doc/DG_2D/*.log
+doc/DG_2D/*.gz
+doc/DG_2D/*.out
+doc/DG_3D/*.aux
+doc/DG_3D/*.log
+doc/DG_3D/*.gz
+doc/DG_3D/*.out
+
+
 # Precompiled Headers
 *.gch
 *.pch
@@ -44,12 +55,3 @@ build/
 mesh/*.off
 mesh/*.msh
 
-# latex
-doc/DG_2D/
-doc/DG_3D/
-!doc/DG_2D/images/
-!doc/DG_3D/images/
-!doc/DG_2D/*.pdf
-!doc/DG_3D/*.pdf
-!doc/DG_2D/*.tex
-!doc/DG_3D/*.tex
