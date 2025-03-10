@@ -27,7 +27,7 @@ def generate_tetrahedral_mesh(filename):
     surfaces = gmsh.model.getEntities(dim=2)
     for surface in surfaces:
         gmsh.model.mesh.setTransfiniteSurface(surface[1], "Left")  # 设置平面为规则分布
-    gmsh.model.mesh.setTransfiniteVolume(box)  # 设置整个立方体为结构化网格
+    # gmsh.model.mesh.setTransfiniteVolume(box)  # 设置整个立方体为结构化网格
     # gmsh.model.mesh.setTransfiniteAutomatic()  # 自动优化一致性
 
     # 同步几何模型
@@ -45,4 +45,4 @@ def generate_tetrahedral_mesh(filename):
     gmsh.finalize()
 
 if __name__ == "__main__":
-    generate_tetrahedral_mesh("tetrahedronMesh0.2.msh")
+    generate_tetrahedral_mesh("tetrahedronMesh.msh")

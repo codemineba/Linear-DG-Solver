@@ -10,6 +10,9 @@
 # vscode
 .vscode/
 
+# external
+external/
+
 # cmake-build
 build/
 

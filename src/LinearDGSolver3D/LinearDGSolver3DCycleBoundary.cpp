@@ -38,34 +38,81 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
             }
         }
     }
+
     // 调整周期边界之间边界积分点的顺序 (确保计算边界上的数值通量时,边界求积点位置能直接对应)
-    for(unsigned long i=0; i<nBoundary; i++){
+    double used_bdy[nBoundary];
+    int used_times=0;
+    for(unsigned long i=0; i<nBoundary; i++){ used_bdy[i]=nFace+1;}
+    for(unsigned long bdy_idx=0; bdy_idx<nBoundary; bdy_idx++){
+
+        // 检查是否已经遍历过该边界
+        unsigned long bdy = boundary[bdy_idx];
+        unsigned long bdy_ = periodic_boundary_[bdy];  // 对应面的边界
+        bool has_used=false;
+        for(unsigned long i=0; i<nBoundary; i++)
+            if(bdy==used_bdy[i]) has_used=true;
+        if(has_used) break; 
+        used_bdy[used_times*2]=bdy; used_bdy[used_times*2+1]=bdy_;
+        used_times++;
+
         // 边界上的三个积分点
-        double v1[dim_] = {barx_[0][nBarx_*boundary[i]], barx_[1][nBarx_*boundary[i]], barx_[2][nBarx_*boundary[i]]};
-        double v2[dim_] = {barx_[0][nBarx_*boundary[i]+1], barx_[1][nBarx_*boundary[i]+1], barx_[2][nBarx_*boundary[i]+1]};
-        double v3[dim_] = {barx_[0][nBarx_*boundary[i]+2], barx_[1][nBarx_*boundary[i]+2], barx_[2][nBarx_*boundary[i]+2]};
+        double v1[dim_] = {barx_[0][nBarx_*bdy], barx_[1][nBarx_*bdy], barx_[2][nBarx_*bdy]};
+        double v2[dim_] = {barx_[0][nBarx_*bdy+1], barx_[1][nBarx_*bdy+1], barx_[2][nBarx_*bdy+1]};
+        double v3[dim_] = {barx_[0][nBarx_*bdy+2], barx_[1][nBarx_*bdy+2], barx_[2][nBarx_*bdy+2]};
+        // 对应边界上的三个积分点
+        double v1_[dim_] = {barx_[0][nBarx_*bdy_], barx_[1][nBarx_*bdy_], barx_[2][nBarx_*bdy_]};
+        double v2_[dim_] = {barx_[0][nBarx_*bdy_+1], barx_[1][nBarx_*bdy_+1], barx_[2][nBarx_*bdy_+1]};
+        double v3_[dim_] = {barx_[0][nBarx_*bdy_+2], barx_[1][nBarx_*bdy_+2], barx_[2][nBarx_*bdy_+2]};
 
-
-        int idx = -1;  // 初始化索引
-        if ((is_almost_equal(v1[0], v2[0]) && !(v1[1] < v2[1] && v2[1] < v3[1]))) {
-            idx = 1;  // 关于yoz平面平行 规定积分点沿y轴正方向排列 即y0 < y1 < y2
-        } else if ((is_almost_equal(v1[1], v2[1]) && !(v1[2] < v2[2] && v2[2] < v3[2]))) {
-            idx = 2;  // 关于zox平面平行 规定积分点沿z轴正方向排列 即z0 < z1 < z2
-        } else if ((is_almost_equal(v1[2], v2[2]) && !(v1[0] < v2[0] && v2[0] < v3[0]))) {
-            idx = 0;  // 关于xoy平面平行 规定积分点沿x轴正方向排列 即x0 < x1 < x2 
+        
+        int idx1 = -1, idx2 = -1;   // 初始化索引
+        if (are_almost_equal(v1[0], v2[0], v3[0])) {
+            idx1=1, idx2=2;  // 关于yoz平面平行 
+        } else if (are_almost_equal(v1[1], v2[1], v3[1])) {
+            idx1=0, idx2=2;  // 关于zox平面平行 
+        } else if (are_almost_equal(v1[2], v2[2], v3[2])) {
+            idx1=0, idx2=1;  // 关于xoy平面平行 
         }
 
-        if (idx != -1) {  
-            // 调整 v坐标位置 以及基函数的值 
-
-            int indices[] = {0, 1, 2};
-            double arr[] = {v1[idx], v2[idx], v3[idx]};
-            // 调用排序函数，对 arr 进行排序，同时更新 indices
-            bubble_sort_with_indices(arr, indices, 3);
-
+        // bdy_的三个积分点按照bdy的顺序排列
+        // 共有 3! =6 种可能的排列方式
+        int indices[nBarx_];
+        double v1_2D[2]={v1[idx1], v1[idx2]}, v2_2D[2]={v2[idx1], v2[idx2]}, v3_2D[2]={v3[idx1], v3[idx2]};
+        double v1_2D_[2]={v1_[idx1], v1_[idx2]}, v2_2D_[2]={v2_[idx1], v2_[idx2]}, v3_2D_[2]={v3_[idx1], v3_[idx2]};
+        bool adjust=true;
+        if (is_almost_equal(v1_2D_, v1_2D, 2) && is_almost_equal(v2_2D_, v2_2D, 2) && is_almost_equal(v3_2D_, v3_2D, 2)) {
+            indices[0] = 0; indices[1] = 1; indices[2] = 2; adjust=false;  // 该情况无需调整
+            // std::cout<<v1[0]<<' '<<v1[1]<<' '<<v1[2]<<std::endl;
+            // std::cout<<v1_[0]<<' '<<v1_[1]<<' '<<v1_[2]<<std::endl;
+            // std::cout<<std::endl;
+        } 
+        else if (is_almost_equal(v1_2D_, v1_2D, 2) && is_almost_equal(v2_2D_, v3_2D, 2) && is_almost_equal(v3_2D_, v2_2D, 2)) {
+            indices[0] = 0; indices[1] = 2; indices[2] = 1;
+        } 
+        else if (is_almost_equal(v1_2D_, v2_2D, 2) && is_almost_equal(v2_2D_, v1_2D, 2) && is_almost_equal(v3_2D_, v3_2D, 2)) {
+            indices[0] = 1; indices[1] = 0; indices[2] = 2;
+        } 
+        else if (is_almost_equal(v1_2D_, v2_2D, 2) && is_almost_equal(v2_2D_, v3_2D, 2) && is_almost_equal(v3_2D_, v1_2D, 2)) {
+            indices[0] = 1; indices[1] = 2; indices[2] = 0;
+        } 
+        else if (is_almost_equal(v1_2D_, v3_2D, 2) && is_almost_equal(v2_2D_, v1_2D, 2) && is_almost_equal(v3_2D_, v2_2D, 2)) {
+            indices[0] = 2; indices[1] = 0; indices[2] = 1;
+        } 
+        else if (is_almost_equal(v1_2D_, v3_2D, 2) && is_almost_equal(v2_2D_, v2_2D, 2) && is_almost_equal(v3_2D_, v1_2D, 2)) {
+            indices[0] = 2; indices[1] = 1; indices[2] = 0;
+        } 
+        else {
+            std::cerr << "Error: No valid matching found!" << std::endl;
+            throw -1;
+        }
+        
+        if (adjust) {  
+            std::cout<< "need adjust position of BarX !"<<std::endl;
+            // 调整 bdy_ 的坐标位置 以及基函数的值 
             // 根据排序后的 indices 数组，重新组织对应的数据
-            unsigned long ik = faceidx[3][boundary[i]];
-            unsigned long order = face_order_in_tet[0][boundary[i]];
+            unsigned long ik = faceidx[3][bdy_];
+            unsigned long order = face_order_in_tet[0][bdy_];
+            unsigned long face_tetra = nSide_*ik+order;
 
             // 临时变量存储排序后的 barx_ 和 phi_barx_ 的值
             double temp_barx[dim_][nBarx_];  
@@ -75,24 +122,24 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
             for (int j = 0; j < nBarx_; ++j) {  // 遍历每个点
                 unsigned long original_index = indices[j];  // 排序前的位置索引
                 for (int n = 0; n < dim_; ++n) {  
-                    temp_barx[n][j] = barx_[n][nBarx_ * boundary[i] + original_index];
+                    temp_barx[n][j] = barx_[n][nBarx_ * bdy_ + original_index];
                 }
                 for (int n = 0; n < nPhi_; ++n) { 
-                    temp_phi_barx[n][j] = phi_barx_[n][nBarx_ * (nSide_*ik+order) + original_index];
+                    temp_phi_barx[n][j] = phi_barx_[n][nBarx_ * face_tetra + original_index];
                 }
             }
-
             // 交换ik面的积分点的顺序
             for (int j = 0; j < nBarx_; ++j) {  // 遍历每个点
                 for (int n = 0; n < dim_; ++n) { 
-                    barx_[n][nBarx_ * boundary[i] + j] = temp_barx[n][j];
+                    barx_[n][nBarx_ * bdy_ + j] = temp_barx[n][j];
                 }
                 for (int n = 0; n < nPhi_; ++n) {
-                    phi_barx_[n][nBarx_ * (nSide_*ik+order) + j] = temp_phi_barx[n][j];
+                    phi_barx_[n][nBarx_ * face_tetra + j] = temp_phi_barx[n][j];
                 }
             }
         }
     }
+
 }
 
 

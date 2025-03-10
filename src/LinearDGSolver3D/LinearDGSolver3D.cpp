@@ -42,9 +42,9 @@ void LinearDGSolver_3D::phi(unsigned long ik, double x, double y, double z, doub
         double tem_volumn_v[dim_][nPhi_];
         for(int i=0; i<dim_; i++){
             tem_volumn_v[i][0]=0.0;
-            tem_volumn_v[i][1]=volume0_v0[i];
-            tem_volumn_v[i][2]=(1.0/3.0)*volume0_v0[i]+volume1_v1[i];
-            tem_volumn_v[i][3]=(1.0/2.0)*volume0_v0[i]+(1.0/2.0)*volume1_v1[i]+volume2_v2[i];
+            tem_volumn_v[i][1]=volume0_v0[i]/volume;
+            tem_volumn_v[i][2]=((1.0/3.0)*volume0_v0[i]+volume1_v1[i])/volume;
+            tem_volumn_v[i][3]=((1.0/2.0)*volume0_v0[i]+(1.0/2.0)*volume1_v1[i]+volume2_v2[i])/volume;
         }
         for(int i=0; i<nPhi_; i++){
             var_x[i]=tem_volumn_v[0][i];
@@ -65,11 +65,11 @@ void LinearDGSolver_3D::flux(double* u, double f[3][5]){
     double E=u[4];  // 能量
     double p =PRESSURE(E, rho, v); // 压强
     
-    f[0][0] = rho*v1,        f[1][0] = rho*v2,        f[2][0] = rho*v3,
-    f[0][1] = rho*v1*v1+p,   f[1][1] = rho*v1*v2,     f[2][1] = rho*v1*v3,
-    f[0][2] = rho*v2*v1,     f[1][2] = rho*v2*v2+p,   f[2][2] = rho*v2*v3, 
-    f[0][3] = rho*v3*v1,     f[1][3] = rho*v3*v2,     f[2][3] = rho*v3*v3+p,
-    f[0][4] = (E+p)*v1,      f[1][4] = (E+p)*v2,      f[2][4] = (E+p)*v3;
+    f[0][0] = rho*v1;        f[1][0] = rho*v2;        f[2][0] = rho*v3;
+    f[0][1] = rho*v1*v1+p;   f[1][1] = rho*v1*v2;     f[2][1] = rho*v1*v3;
+    f[0][2] = rho*v2*v1;     f[1][2] = rho*v2*v2+p;   f[2][2] = rho*v2*v3; 
+    f[0][3] = rho*v3*v1;     f[1][3] = rho*v3*v2;     f[2][3] = rho*v3*v3+p;
+    f[0][4] = (E+p)*v1;      f[1][4] = (E+p)*v2;      f[2][4] = (E+p)*v3;
     
 }
 
@@ -138,30 +138,6 @@ void LinearDGSolver_3D::computeElementProperties(){
         }
     }
 
-    // 计算边界面积以及边界处积分点
-    // double bareta[4][3][4]={
-    //     {
-    //         {0.0, 2.0/3.0, 1.0/6.0, 1.0/6.0},
-    //         {0.0, 1.0/6.0, 2.0/3.0, 1.0/6.0},
-    //         {0.0, 1.0/6.0, 1.0/6.0, 2.0/3.0}
-    //     },
-    //     {
-    //         {2.0/3.0, 0.0, 1.0/6.0, 1.0/6.0},
-    //         {1.0/6.0, 0.0, 2.0/3.0, 1.0/6.0},
-    //         {1.0/6.0, 0.0, 1.0/6.0, 2.0/3.0}
-    //     },
-    //     {
-    //         {2.0/3.0, 1.0/6.0, 0.0, 1.0/6.0},
-    //         {1.0/6.0, 2.0/3.0, 0.0, 1.0/6.0},
-    //         {1.0/6.0, 1.0/6.0, 0.0, 2.0/3.0}
-    //     },
-    //     {
-    //         {2.0/3.0, 1.0/6.0, 1.0/6.0, 0.0},
-    //         {1.0/6.0, 2.0/3.0, 1.0/6.0, 0.0},
-    //         {1.0/6.0, 1.0/6.0, 2.0/3.0, 0.0}
-    //     }
-    // };
-
     double bareta[nBarx_][3]={
         {2.0/3.0, 1.0/6.0, 1.0/6.0},
         {1.0/6.0, 2.0/3.0, 1.0/6.0},
@@ -197,19 +173,22 @@ void LinearDGSolver_3D::computeOuterNormal(){
     double *y=tetmesh_->y_coord();
     double *z=tetmesh_->z_coord();
     unsigned long ** tet=tetmesh_->tetrahedron();
+    unsigned long** tet_edge_conn = tetmesh_->tet_face_connection();
+    unsigned long** faceInfo = tetmesh_->face_info();
 
     for(unsigned long ik=0; ik<nElement; ik++){
-        for(unsigned long ie=0; ie<4; ie++){
+        for(int ie=0; ie<nSide_; ie++){  // 每个面 
             unsigned long p0, p1, p2, p3;
-            if(ie==0){  // eta_0
-                p0=tet[0][ik], p1=tet[1][ik], p2=tet[2][ik], p3=tet[3][ik];
-            }else if(ie==1){  // eta_1
-                p0=tet[1][ik], p1=tet[0][ik], p2=tet[2][ik], p3=tet[3][ik];
-            }else if(ie==2){  //eta_2
-                p0=tet[2][ik], p1=tet[0][ik], p2=tet[1][ik], p3=tet[3][ik];
-            }else if(ie==3){  //eta_3
-                p0=tet[3][ik], p1=tet[0][ik], p2=tet[1][ik], p3=tet[2][ik];
-            }
+
+            p1 = faceInfo[0][tet_edge_conn[ie][ik]];
+            p2 = faceInfo[1][tet_edge_conn[ie][ik]];
+            p3 = faceInfo[2][tet_edge_conn[ie][ik]]; 
+            // p0 是 tet[0][ik], tet[1][ik], tet[2][ik], tet[3][ik] 中 p1, p2, p3 除外的
+            p0 = (tet[0][ik] != p1 && tet[0][ik] != p2 && tet[0][ik] != p3) ? tet[0][ik] :
+                   (tet[1][ik] != p1 && tet[1][ik] != p2 && tet[1][ik] != p3) ? tet[1][ik] :
+                   (tet[2][ik] != p1 && tet[2][ik] != p2 && tet[2][ik] != p3) ? tet[2][ik] :
+                   tet[3][ik];
+
             // 计算法向量
             double a1a2[dim_]={x[p2]-x[p1],y[p2]-y[p1],z[p2]-z[p1]};
             double a1a3[dim_]={x[p3]-x[p1],y[p3]-y[p1],z[p3]-z[p1]};
@@ -233,7 +212,7 @@ void LinearDGSolver_3D::computeOuterNormal(){
 
 // 计算基函数在相关节点上的值
 void LinearDGSolver_3D::computeBasisOnNodes(){
-    unsigned long ** tet_edge_conn = tetmesh_->tet_face_connection();
+    unsigned long** tet_edge_conn = tetmesh_->tet_face_connection();
 
     // 计算基函数相关值 
     // 在不同单元顶点基函数值是相同的
@@ -425,7 +404,7 @@ void LinearDGSolver_3D::computeSpaceDiscretization(double** u, double**f) {
             for (int ie=0; ie<nSide_; ie++){   // 边循环
                 double scale2 = face_area_[conn[ie][ik]]/(nBarx_*aj);
                 for (int m=0; m<nBarx_; m++){  // 面上求积点循环
-                    for(int n=0; n<nVars_; n++){  // 对于5个物理量循环
+                    for(int n=0; n<nVars_; n++){  // 对于5个物理量
                         f[n][ik*nPhi_+j] -= scale2 * flux[nBarx_*ie+m][n] * phi_barx_[j][nBarx_*(ik*nSide_+ie)+m];
                     }
                 }

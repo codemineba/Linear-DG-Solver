@@ -34,7 +34,7 @@ def convert_msh_to_off(file_name, output_off_filenamne):
 
 if __name__ == "__main__":
     # 示例：输入 .msh 文件和输出 .off 文件路径
-    input_msh_file = "tetrahedral_mesh.msh"
+    input_msh_file = "tetrahedronMesh.msh"
     output_off_file = "surface_mesh.off"
 
     convert_msh_to_off(input_msh_file, output_off_file)
