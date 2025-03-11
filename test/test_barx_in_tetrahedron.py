@@ -3,7 +3,7 @@ import os
 
 def generate_tetrahedral_mesh(filename):
     # 获取当前脚本所在目录
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = os.path.dirname(os.path.fabspath(__file__))
     path = os.path.join(script_dir, filename)
 
     # 初始化 Gmsh

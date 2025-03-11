@@ -5,7 +5,7 @@ using namespace std;
 
 // 用于判断两个 double 是否近似相等
 bool is_almost_equal(double a, double b, double scale = 1e-9) {
-    return abs(a - b) < scale;
+    return fabs(a - b) < scale;
 }
 
 // 判断 edge1 是否可以通过平移得到 edge2

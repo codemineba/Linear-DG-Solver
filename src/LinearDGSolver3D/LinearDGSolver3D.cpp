@@ -84,11 +84,11 @@ void LinearDGSolver_3D::numerical_flux(double* u1, double *u2, double *normal, d
     // 计算谱半径
     double rho1=u1[0], E1=u1[4], v1[dim_]={u1[1]/u1[0], u1[2]/u1[0], u1[3]/u1[0]};
     double cs1 =SOUND_SPEED(PRESSURE(E1, rho1, v1), rho1);
-    double lambda_u1 = abs(dot(v1, normal, dim_))+cs1;
+    double lambda_u1 = fabs(dot(v1, normal, dim_))+cs1;
 
     double rho2=u2[0], E2=u2[4], v2[dim_]={u2[1]/u2[0], u2[2]/u2[0], u2[3]/u2[0]};
     double cs2 =SOUND_SPEED(PRESSURE(E2, rho2, v2), rho2);    
-    double lambda_u2 = abs(dot(v2, normal, dim_))+cs2;
+    double lambda_u2 = fabs(dot(v2, normal, dim_))+cs2;
 
     double alpha= lambda_u1 > lambda_u2 ? lambda_u1 : lambda_u2;
 
@@ -116,7 +116,7 @@ void LinearDGSolver_3D::computeElementProperties(){
         double v2[dim_]={x[tet[2][i]], y[tet[2][i]], z[tet[2][i]]};
         double v3[dim_]={x[tet[3][i]], y[tet[3][i]], z[tet[3][i]]};
 
-        volume_[i]=abs(directed_3D_tetrahedron_volume(v0, v1, v2, v3));
+        volume_[i]=fabs(directed_3D_tetrahedron_volume(v0, v1, v2, v3));
     }
 
     // 计算单元内求积节点
@@ -153,7 +153,7 @@ void LinearDGSolver_3D::computeElementProperties(){
             }
         }
         double v0[3]={x[faceidx[0][i]], y[faceidx[0][i]], z[faceidx[0][i]]}, v1[3]={x[faceidx[1][i]], y[faceidx[1][i]], z[faceidx[1][i]]}, v2[3]={x[faceidx[2][i]], y[faceidx[2][i]], z[faceidx[2][i]]};
-        face_area_[i]=abs(directed_3D_triangle_area(v0, v1, v2));
+        face_area_[i]=fabs(directed_3D_triangle_area(v0, v1, v2));
     }
 
     // 计算表面积
@@ -516,8 +516,8 @@ void LinearDGSolver_3D::computeTimeDiscretization(double total_time, double* sav
         // 检查是否需要保存该时间点的结果
         if(save_time_points && time_step_index<num_times_point_save_){
             double save_time_point = save_time_points[time_step_index];
-            double interval_save = abs(save_time_point - timePoint_);  // 当前与目标保存时长的时间距离
-            double intervalNext_save = abs(save_time_point - (timePoint_ + timeInterval_)); // 下一阶段与目标保存时长的时间距离
+            double interval_save = fabs(save_time_point - timePoint_);  // 当前与目标保存时长的时间距离
+            double intervalNext_save = fabs(save_time_point - (timePoint_ + timeInterval_)); // 下一阶段与目标保存时长的时间距离
             int shift = dof_ * time_step_index;
             if (interval_save < intervalNext_save) {  // 找出与目标保存时长距离最近的时间点
                 std::cout<<"Saved, time is " << timePoint_ << std::endl;
@@ -531,8 +531,8 @@ void LinearDGSolver_3D::computeTimeDiscretization(double total_time, double* sav
         }
 
         // 检查是否已到达目标计算时长
-        double interval_total = abs(total_time - timePoint_);  // 当前与目标计算时长的时间距离
-        double intervalNext_total = abs(total_time - (timePoint_ + timeInterval_)); // 下一阶段与目标计算时长的时间距离
+        double interval_total = fabs(total_time - timePoint_);  // 当前与目标计算时长的时间距离
+        double intervalNext_total = fabs(total_time - (timePoint_ + timeInterval_)); // 下一阶段与目标计算时长的时间距离
         if (interval_total < intervalNext_total) {  // 找出与目标计算时长距离最近的时间点
             std::cout<<"Iterated over! Total time is " << timePoint_ << std::endl;
             if(!save_time_points){  // 默认保存最后一步的值

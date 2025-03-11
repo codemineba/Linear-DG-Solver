@@ -29,11 +29,11 @@ void LinearDGSolver_2D_CavityObstacleFlow::computeBoundaryType() {
     
         // 判断该边界是与x轴平行还是与y轴平行, 并查找对应的周期边界
         double scale = 1.0e-10;   // 浮点数不能直接用与比较大小, 定义一个小的范围来进行比较
-        if(abs(vx1-vx2) < scale && abs(vx1-left_boundary_value_) < scale){  // 左边界 (入流边界)
+        if(fabs(vx1-vx2) < scale && fabs(vx1-left_boundary_value_) < scale){  // 左边界 (入流边界)
             boundary_type_[idx_edge] = 0;
-        }else if(((abs(vx1-vx2) < scale) && (abs(vx1-right_boundary_value_)< scale)) || 
-         ((abs(vy1-vy2) < scale) && (abs(vy1-top_boundary_value_)< scale)) ||
-         ((abs(vy1-vy2) < scale) && (abs(vy1-bottom_boundary_value_)< scale))){  // 右边界, 上下边界 (流出边界)
+        }else if(((fabs(vx1-vx2) < scale) && (fabs(vx1-right_boundary_value_)< scale)) || 
+         ((fabs(vy1-vy2) < scale) && (fabs(vy1-top_boundary_value_)< scale)) ||
+         ((fabs(vy1-vy2) < scale) && (fabs(vy1-bottom_boundary_value_)< scale))){  // 右边界, 上下边界 (流出边界)
             boundary_type_[idx_edge] = 1;  
         }else{  // 障碍物边界 (反射边界)
             boundary_type_[idx_edge] = 2;

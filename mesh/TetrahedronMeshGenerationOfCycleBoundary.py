@@ -3,7 +3,7 @@ import os
 
 def generate_tetrahedral_mesh(filename):
     # 获取当前脚本所在目录
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = os.path.dirname(os.path.fabspath(__file__))
     path = os.path.join(script_dir, filename)
 
     # 初始化 Gmsh
@@ -17,7 +17,7 @@ def generate_tetrahedral_mesh(filename):
     gmsh.model.occ.synchronize()
 
     # 在六个面上设置一致分布
-    divisions = 81  # 网格点划分数目，可调整
+    divisions = 6  # 网格点划分数目，可调整
 
     # 获取立方体的边并设置一致划分
     edges = gmsh.model.getEntities(dim=1)  # 获取所有 1D 实体（边）
@@ -45,4 +45,4 @@ def generate_tetrahedral_mesh(filename):
     gmsh.finalize()
 
 if __name__ == "__main__":
-    generate_tetrahedral_mesh("tetrahedronMesh0.025.msh")
+    generate_tetrahedral_mesh("tetrahedronMesh0.4.msh")

@@ -8,7 +8,7 @@ int main() {
 
     std::string read_path = std::string(SOURCE_DIR) + "/data/2D/CycleBoundary/";
     std::string write_path = std::string(SOURCE_DIR) + "/result/2D/CycleBoundary/";
-    std::string fileName = "triangleMesh0.1.off";
+    std::string fileName = "triangleMesh0.0125.off";
     
     TriangleMesh *mesh=new TriangleMesh;
     mesh->read_off(read_path + fileName);

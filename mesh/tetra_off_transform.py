@@ -3,7 +3,7 @@ import os
 
 def off_transform(file_name):
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = os.path.dirname(os.path.fabspath(__file__))
     path = os.path.join(script_dir, file_name)
     mesh = meshio.read(path)
 
@@ -26,4 +26,4 @@ def off_transform(file_name):
         f.close()
 
 
-off_transform('tetrahedronMesh0.025.msh')
+off_transform('tetrahedronMesh0.4.msh')

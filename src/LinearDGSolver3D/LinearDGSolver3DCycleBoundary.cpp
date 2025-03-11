@@ -145,7 +145,10 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
 
 // 计算初值条件
 void LinearDGSolver_3D_CycleBoundary::computeInitialCondition(unsigned long n, double *x, double *y, double *z, double **rtval) {
-    double u0[nVars_][dof_];   // n=dof_
+    double** u0 = new double*[nVars_];  
+    for (int i = 0; i < nVars_; i++) {
+        u0[i] = new double[dof_]{0.0};  // 初始化为 0
+    }
     for (unsigned long i=0; i<n; i++){
         // 初始条件
         u0[0][i] = 1+0.2*sin(PI*(x[i]+y[i]+z[i]));
@@ -172,6 +175,11 @@ void LinearDGSolver_3D_CycleBoundary::computeInitialCondition(unsigned long n, d
             }
         }
     }
+
+    for (int i = 0; i < nVars_; i++) {
+        delete[] u0[i];
+    }
+    delete[] u0;
 }
 
 
@@ -199,10 +207,6 @@ void LinearDGSolver_3D_CycleBoundary::computeNumericalFluxOnBoundary(unsigned lo
     unsigned ik_ = faceInfo[3][idx_edge_];
     // idx_edge_在ik_中的顺序ie_
     unsigned long ie_ = face_order_in_tet[0][idx_edge_];
-
-    // std::cout<<std::endl;
-    // std::cout<<barx_[0][3*(idx_edge)]<<" "<<barx_[1][3*(idx_edge)]<<" "<<barx_[2][3*(idx_edge)]<<std::endl;
-    // std::cout<<barx_[0][3*(idx_edge_)]<<" "<<barx_[1][3*(idx_edge_)]<<" "<<barx_[2][3*(idx_edge_)]<<std::endl;
 
     // 计算u(x, y, z) 在高斯点上的值
     double u1[nBarx_][5], u2[nBarx_][5];

@@ -3,7 +3,7 @@ import os
 
 def convert_msh_to_off(file_name, output_off_filenamne):
     # 读取 .msh 文件
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = os.path.dirname(os.path.fabspath(__file__))
     path = os.path.join(script_dir, file_name)
     mesh = meshio.read(path)
 
