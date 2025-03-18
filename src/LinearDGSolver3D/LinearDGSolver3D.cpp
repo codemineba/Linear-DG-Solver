@@ -13,11 +13,11 @@ void LinearDGSolver_3D::phi(unsigned long ik, double x, double y, double z, doub
     double x0 = x_[tet[0][ik]], x1 = x_[tet[1][ik]], x2 = x_[tet[2][ik]], x3 = x_[tet[3][ik]];
     double y0 = y_[tet[0][ik]], y1 = y_[tet[1][ik]], y2 = y_[tet[2][ik]], y3 = y_[tet[3][ik]];
     double z0 = z_[tet[0][ik]], z1 = z_[tet[1][ik]], z2 = z_[tet[2][ik]], z3 = z_[tet[3][ik]];
-    double v0[dim_] = {x0, y0, z0};
-    double v1[dim_] = {x1, y1, z1};
-    double v2[dim_] = {x2, y2, z2};
-    double v3[dim_] = {x3, y3, z3};
-    double v[dim_]  = {x, y, z};
+    double v0[3] = {x0, y0, z0};
+    double v1[3] = {x1, y1, z1};
+    double v2[3] = {x2, y2, z2};
+    double v3[3] = {x3, y3, z3};
+    double v[3]  = {x, y, z};
 
     // 体积坐标
     double volume=directed_3D_tetrahedron_volume(v0, v1, v2, v3);
@@ -39,8 +39,8 @@ void LinearDGSolver_3D::phi(unsigned long ik, double x, double y, double z, doub
         directed_3D_tetrahedron_volume_gradient(v0, v, v2, v3, 1, volume1_v1);
         directed_3D_tetrahedron_volume_gradient(v0, v1, v, v3, 2, volume2_v2);
 
-        double tem_volumn_v[dim_][nPhi_];
-        for(int i=0; i<dim_; i++){
+        double tem_volumn_v[3][nPhi_];
+        for(int i=0; i<3; i++){
             tem_volumn_v[i][0]=0.0;
             tem_volumn_v[i][1]=volume0_v0[i]/volume;
             tem_volumn_v[i][2]=((1.0/3.0)*volume0_v0[i]+volume1_v1[i])/volume;
@@ -61,7 +61,7 @@ void LinearDGSolver_3D::flux(double* u, double f[3][5]){
     double v1=u[1]/u[0];  // x方向速度
     double v2=u[2]/u[0];  // y方向速度
     double v3=u[3]/u[0];  // z方向速度
-    double v[dim_]={v1, v2, v3}; 
+    double v[3]={v1, v2, v3}; 
     double E=u[4];  // 能量
     double p =PRESSURE(E, rho, v); // 压强
     
@@ -74,7 +74,7 @@ void LinearDGSolver_3D::flux(double* u, double f[3][5]){
 }
 
 void LinearDGSolver_3D::numerical_flux(double* u1, double *u2, double *normal, double* f){
-    double fu1[dim_][5], fu2[dim_][5], fn[nVars_];
+    double fu1[3][5], fu2[3][5], fn[nVars_];
     flux(u1, fu1);
     flux(u2, fu2);
     for(int i=0; i<nVars_; i++){
@@ -82,13 +82,13 @@ void LinearDGSolver_3D::numerical_flux(double* u1, double *u2, double *normal, d
     }
 
     // 计算谱半径
-    double rho1=u1[0], E1=u1[4], v1[dim_]={u1[1]/u1[0], u1[2]/u1[0], u1[3]/u1[0]};
+    double rho1=u1[0], E1=u1[4], v1[3]={u1[1]/u1[0], u1[2]/u1[0], u1[3]/u1[0]};
     double cs1 =SOUND_SPEED(PRESSURE(E1, rho1, v1), rho1);
-    double lambda_u1 = fabs(dot(v1, normal, dim_))+cs1;
+    double lambda_u1 = fabs(dot(v1, normal, 3))+cs1;
 
-    double rho2=u2[0], E2=u2[4], v2[dim_]={u2[1]/u2[0], u2[2]/u2[0], u2[3]/u2[0]};
+    double rho2=u2[0], E2=u2[4], v2[3]={u2[1]/u2[0], u2[2]/u2[0], u2[3]/u2[0]};
     double cs2 =SOUND_SPEED(PRESSURE(E2, rho2, v2), rho2);    
-    double lambda_u2 = fabs(dot(v2, normal, dim_))+cs2;
+    double lambda_u2 = fabs(dot(v2, normal, 3))+cs2;
 
     double alpha= lambda_u1 > lambda_u2 ? lambda_u1 : lambda_u2;
 
@@ -111,17 +111,17 @@ void LinearDGSolver_3D::computeElementProperties(){
 
     // 计算体积
     for (unsigned long i=0; i<nElement; ++i){
-        double v0[dim_]={x[tet[0][i]], y[tet[0][i]], z[tet[0][i]]};
-        double v1[dim_]={x[tet[1][i]], y[tet[1][i]], z[tet[1][i]]};
-        double v2[dim_]={x[tet[2][i]], y[tet[2][i]], z[tet[2][i]]};
-        double v3[dim_]={x[tet[3][i]], y[tet[3][i]], z[tet[3][i]]};
+        double v0[3]={x[tet[0][i]], y[tet[0][i]], z[tet[0][i]]};
+        double v1[3]={x[tet[1][i]], y[tet[1][i]], z[tet[1][i]]};
+        double v2[3]={x[tet[2][i]], y[tet[2][i]], z[tet[2][i]]};
+        double v3[3]={x[tet[3][i]], y[tet[3][i]], z[tet[3][i]]};
 
         volume_[i]=fabs(directed_3D_tetrahedron_volume(v0, v1, v2, v3));
     }
 
     // 计算单元内求积节点
     double alpha=0.58541020, beta=0.13819660;
-    double hateta[nHatx_][4]={  // 标准单元内的4个求积节点
+    double hateta[4][4]={  // 标准单元内的4个求积节点
         {alpha, beta, beta, 1-alpha-beta-beta},
         {beta, alpha, beta, 1-beta-alpha-beta},
         {beta, beta, alpha, 1-beta-beta-alpha},
@@ -138,7 +138,7 @@ void LinearDGSolver_3D::computeElementProperties(){
         }
     }
 
-    double bareta[nBarx_][3]={
+    double bareta[3][3]={
         {2.0/3.0, 1.0/6.0, 1.0/6.0},
         {1.0/6.0, 2.0/3.0, 1.0/6.0},
         {1.0/6.0, 1.0/6.0, 2.0/3.0}
@@ -190,17 +190,17 @@ void LinearDGSolver_3D::computeOuterNormal(){
                    tet[3][ik];
 
             // 计算法向量
-            double a1a2[dim_]={x[p2]-x[p1],y[p2]-y[p1],z[p2]-z[p1]};
-            double a1a3[dim_]={x[p3]-x[p1],y[p3]-y[p1],z[p3]-z[p1]};
-            double a1a0[dim_]={x[p0]-x[p1],y[p0]-y[p1],z[p0]-z[p1]};
-            double a1a2_cross_a1a3[dim_];
+            double a1a2[3]={x[p2]-x[p1],y[p2]-y[p1],z[p2]-z[p1]};
+            double a1a3[3]={x[p3]-x[p1],y[p3]-y[p1],z[p3]-z[p1]};
+            double a1a0[3]={x[p0]-x[p1],y[p0]-y[p1],z[p0]-z[p1]};
+            double a1a2_cross_a1a3[3];
             cross(a1a2, a1a3, a1a2_cross_a1a3);
-            double magnitude=l2_norm(a1a2_cross_a1a3, dim_);
-            if(dot(a1a2_cross_a1a3, a1a0, dim_)<0){
+            double magnitude=l2_norm(a1a2_cross_a1a3, 3);
+            if(dot(a1a2_cross_a1a3, a1a0, 3)<0){
                 outerNormal_[0][ik*nSide_+ie]=a1a2_cross_a1a3[0]/magnitude;
                 outerNormal_[1][ik*nSide_+ie]=a1a2_cross_a1a3[1]/magnitude;
                 outerNormal_[2][ik*nSide_+ie]=a1a2_cross_a1a3[2]/magnitude;
-            }else if(dot(a1a2_cross_a1a3, a1a0, dim_)>0){
+            }else if(dot(a1a2_cross_a1a3, a1a0, 3)>0){
                 outerNormal_[0][ik*nSide_+ie]=-a1a2_cross_a1a3[0]/magnitude;
                 outerNormal_[1][ik*nSide_+ie]=-a1a2_cross_a1a3[1]/magnitude;
                 outerNormal_[2][ik*nSide_+ie]=-a1a2_cross_a1a3[2]/magnitude;
@@ -263,7 +263,7 @@ void LinearDGSolver_3D::computeInitialData() {
 
 
 void LinearDGSolver_3D::computeFluxOnElement(unsigned long ik, double** u, double f[3][20]){
-    double fu[dim_][5]; // 用于储存该边的f(u)通量
+    double fu[3][5]; // 用于储存该边的f(u)通量
     double ui[nVars_];  // 储存该边的物理量
     for(int i=0; i<nHatx_; i++){  // 按四个求积点循环
         for(int n=0; n<nVars_; n++){  // 5个物理量
@@ -274,7 +274,7 @@ void LinearDGSolver_3D::computeFluxOnElement(unsigned long ik, double** u, doubl
         }
         flux(ui, fu);  // 计算该边通
         // 将该边通量储存到f中 f即储存了一个单元四个通量
-        for(int k=0; k<dim_; k++){
+        for(int k=0; k<3; k++){
             for(int n=0; n<nVars_; n++){
                 f[k][i*nVars_+n] = fu[k][n];
             }
@@ -307,7 +307,7 @@ void LinearDGSolver_3D::computeNumericalFluxOnInteriorEdge(unsigned long ik, uns
     unsigned long idx_face = tet_face_conn[ie][ik];    
 
     // 外法向量
-    double normal[dim_];
+    double normal[3];
     normal[0] = outerNormal_[0][ik*nSide_+ie];
     normal[1] = outerNormal_[1][ik*nSide_+ie];
     normal[2] = outerNormal_[2][ik*nSide_+ie];
@@ -350,7 +350,7 @@ void LinearDGSolver_3D::computeNumericalFluxOnElement(unsigned long ik, double**
     unsigned long** faceInfo = tetmesh_->face_info();
     unsigned long **tet_face_conn_ = tetmesh_->tet_face_connection();
     
-    double flux[dim_][5];
+    double flux[3][5];
     for(int i=0; i<nSide_; i++){  // 四个面
         unsigned long ie = tet_face_conn_[i][ik];  // 该面索引
         // 判断该边是否是边界
@@ -380,7 +380,7 @@ void LinearDGSolver_3D::computeSpaceDiscretization(double** u, double**f) {
             f[n][j]=0.0;
         }
     }
-    double fu[dim_][20], flux[nBarx_*nSide_][5];  // 20=nVars_*nHatx_  5=nVars_
+    double fu[3][20], flux[nBarx_*nSide_][5];  // 20=nVars_*nHatx_  5=nVars_
     for (unsigned long ik=0; ik<nElement; ik++){  // 单元数
         computeFluxOnElement(ik, u, fu);  // 计算k单元的f(u)通量
         computeNumericalFluxOnElement(ik, u, flux);  // 计算k单元的数值通量
@@ -416,21 +416,24 @@ void LinearDGSolver_3D::computeSpaceDiscretization(double** u, double**f) {
 
 double LinearDGSolver_3D::computeTimeStep(double** u){
     
-    double dm[nElement]={0}; 
+    double *dm=new double[nElement];
+    for (unsigned long j=0; j<nElement; ++j){
+        dm[j]=0;
+    }
 
     for(unsigned long i=0; i<nElement; i++){
         double u_average[nVars_];
         for(int j=0; j<nVars_; j++){
             u_average[j] = (u[j][i*nPhi_] + u[j][i*nPhi_+1] + u[j][i*nPhi_+2] + u[j][i*nPhi_+3]) / nPhi_;
         }
-        double rho=u_average[0], E=u_average[4], v[dim_]={u_average[1]/u_average[0], u_average[2]/u_average[0], u_average[3]/u_average[0]};
+        double rho=u_average[0], E=u_average[4], v[3]={u_average[1]/u_average[0], u_average[2]/u_average[0], u_average[3]/u_average[0]};
         double cs =SOUND_SPEED(PRESSURE(E, rho, v), rho);
-        dm[i] = (l2_norm(v, dim_) + cs) * (sufacearea_[i] / volume_[i]);
+        dm[i] = (l2_norm(v, 3) + cs) * (sufacearea_[i] / volume_[i]);
     }
 
-    int n = sizeof(dm) / sizeof(dm[0]); // 数组大小 (nElement)
-    double max_dm = *std::max_element(dm, dm + n);  // 寻找最大值 
+    double max_dm = *std::max_element(dm, dm + nElement);  // 寻找最大值 
 
+    delete []dm;
     return CFL/max_dm;
     
 }
@@ -670,7 +673,7 @@ void LinearDGSolver_3D::outputTecPlotDataFile(const std::string &fname, double t
         double vx = uh[1][i] / rho;
         double vy = uh[2][i] / rho;
         double vz = uh[3][i] / rho;
-        double v[dim_] = {vx, vy, vz};
+        double v[3] = {vx, vy, vz};
         double E = uh[4][i];
         double p = PRESSURE(E, rho, v);
     
@@ -806,7 +809,7 @@ void LinearDGSolver_3D::outputVTKDataFile(const std::string &fname, double time_
         double vx = uh[1][i] / rho;
         double vy = uh[2][i] / rho;
         double vz = uh[3][i] / rho;
-        double v[dim_] = {vx, vy, vz};
+        double v[3] = {vx, vy, vz};
         double E = uh[4][i];
         double p = PRESSURE(E, rho, v); // p 的计算
         output << std::setprecision(15) << std::setw(20) << p << std::endl;

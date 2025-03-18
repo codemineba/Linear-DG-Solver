@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstring> 
+#include <sstream>
 #include <algorithm>
 #include "mesh_structure/TriangleMesh.h"
 #include "SciCalUtils/GeometryUtils.h"
@@ -19,7 +20,6 @@ class LinearDGSolver_2D {
 
 protected:
 
-    const int dim_;                // 维数
     const int nVars_;              // 物理量(守恒量)个数
     const int nHatx_;              // 中点个数(每个单元)  
     const int nBarx_;              // 高斯点个数(每条边)
@@ -60,7 +60,7 @@ public:
 
     // 构造函数
     LinearDGSolver_2D(TriangleMesh *mesh) 
-        : dim_(2), nVars_(4), nHatx_(3), nBarx_(2), nPhi_(3), nSide_(3), nCorner_(3) {
+        : nVars_(4), nHatx_(3), nBarx_(2), nPhi_(3), nSide_(3), nCorner_(3) {
 
         timeInterval_ = 0.0;
         timePoint_ = 0.0;
@@ -76,7 +76,7 @@ public:
         edge_len_= new double[nEdge];          // 边长
         area_ = new double[nElement];          // 面积
         perimeter_ = new double[nElement];     // 周长
-        for(int i=0; i<dim_; i++){ 
+        for(int i=0; i<2; i++){ 
             hatx_[i] = new double[nEdge];             // 中点
             barx_[i] = new double[nEdge*nBarx_];      // 高斯点
             outerNormal_[i] = new double[dof_];       // 外法向量 
@@ -103,7 +103,7 @@ public:
         delete[] area_;
         delete[] edge_len_;
         delete[] perimeter_;
-        for (int i=0; i<dim_; i++){
+        for (int i=0; i<2; i++){
             delete[] hatx_[i];
             delete[] barx_[i];
             delete[] outerNormal_[i];
@@ -119,6 +119,7 @@ public:
             delete[] u0_[i];
         }
         delete[] rho;
+        delete[] times_point_save_;
     }
 
 

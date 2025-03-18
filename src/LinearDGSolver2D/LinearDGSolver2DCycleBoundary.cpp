@@ -38,8 +38,8 @@ void LinearDGSolver_2D_CycleBoundary::computePeriodicBoundaryInfo(){
     // 调整周期边界之间高斯点的顺序 (确保计算边界上的数值通量时,高斯点位置能直接对应)
     for(unsigned long i=0; i<nBoundary; i++){
         // 边界上的两个高斯点
-        double v1[dim_] = {barx_[0][nBarx_*boundary[i]], barx_[1][nBarx_*boundary[i]]};
-        double v2[dim_] = {barx_[0][nBarx_*boundary[i]+1], barx_[1][nBarx_*boundary[i]+1]};
+        double v1[2] = {barx_[0][nBarx_*boundary[i]], barx_[1][nBarx_*boundary[i]]};
+        double v2[2] = {barx_[0][nBarx_*boundary[i]+1], barx_[1][nBarx_*boundary[i]+1]};
         if((is_almost_equal(v1[0], v2[0]) && (v1[1] > v2[1])) || // 关于y轴平行 规定高斯点从下往上排列(y轴正方向) 即y0 < y1
         (is_almost_equal(v1[1], v2[1]) && (v1[0] > v2[0])))      // 关于x轴平行 规定高斯点从左往右排列(x轴正方向) 即x0 < x1
         {  
@@ -79,7 +79,7 @@ void LinearDGSolver_2D_CycleBoundary::computeNumericalFluxOnBoundary(unsigned lo
     unsigned long idx_edge = tri_edge_conn[ie][ik];
 
     // 外法向量
-    double normal[dim_];
+    double normal[2];
     normal[0] = outerNormal_[0][ik*nSide_+ie];
     normal[1] = outerNormal_[1][ik*nSide_+ie];
 
@@ -118,7 +118,7 @@ double LinearDGSolver_2D_CycleBoundary::computeL2ErrorOfRho(){
     double *y=trimesh_->y_coord();
 
     // 密度准确解
-    double* exactSolution = new double[nVertex];
+    double exactSolution[nVertex];
     for (unsigned long i =0; i<nVertex; i++){
         exactSolution[i] = 1.0 + 0.2 * sin(PI*(x[i] + y[i] - timePoint_)); 
     }

@@ -20,7 +20,7 @@ public:
         : LinearDGSolver_2D(mesh){}
 
     ~LinearDGSolver_2D_CavityObstacleFlow() override{
-        delete boundary_type_;
+        delete[] boundary_type_;
     }
 
     // 计算边界类型

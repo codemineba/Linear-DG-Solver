@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstring> 
+#include <sstream>
 #include <algorithm>
 #include "mesh_structure/TetrahedronMesh.h"
 #include "SciCalUtils/GeometryUtils.h"
@@ -19,7 +20,6 @@ class LinearDGSolver_3D {
 
 protected:
 
-    const int dim_;                // 维数
     const int nVars_;              // 物理量(守恒量)个数
     const int nHatx_;              // 单元内求积点个数(每个单元)  
     const int nBarx_;              // 单元边界上求积点个数(每条边)
@@ -62,7 +62,7 @@ public:
 
     // 构造函数
     LinearDGSolver_3D(TetrahedronMesh *mesh) 
-        : dim_(3), nVars_(5), nHatx_(4), nBarx_(3), nPhi_(4), nSide_(4) ,nCorner_(4) {
+        :nVars_(5), nHatx_(4), nBarx_(3), nPhi_(4), nSide_(4) ,nCorner_(4) {
 
         timeInterval_ = 0.0;
         timePoint_ = 0.0;
@@ -78,7 +78,7 @@ public:
         face_area_= new double[nFace];         // 面积
         volume_ = new double[nElement];        // 体积
         sufacearea_ = new double[nElement];    // 表面积
-        for (int i=0; i<dim_; i++){ 
+        for (int i=0; i<3; i++){ 
             hatx_[i] = new double[nElement*nHatx_];   // 标准单元内求积节点
             barx_[i] = new double[nFace*nBarx_];      // 标准单元边界上求积节点   
             outerNormal_[i] = new double[dof_];  // 外法向量
@@ -113,18 +113,20 @@ public:
         for (int i=0; i<3; i++){ 
             delete[] outerNormal_[i];
         }
-        for (int i=0; i<4; i++){
+        for (int i=0; i<nPhi_; i++){
+            delete[] phi_hatx_[i];
             delete[] phi_hatx_x_[i];
             delete[] phi_hatx_y_[i];
             delete[] phi_hatx_z_[i];
             delete[] phi_barx_[i];
             delete[] phi_vec_[i];
         }
-        for (int i=0; i<5; i++){
+        for (int i=0; i<nVars_; i++){
             delete[] u_[i];
             delete[] u0_[i];
         }
         delete[] rho;
+        delete[] times_point_save_;
     }
 
 

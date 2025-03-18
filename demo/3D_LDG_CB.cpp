@@ -8,7 +8,7 @@ int main() {
 
     std::string read_path = std::string(SOURCE_DIR) + "/data/3D/CycleBoundary/";
     std::string write_path = std::string(SOURCE_DIR) + "/result/3D/CycleBoundary/";
-    std::string fileName = "tetrahedronMesh0.1.off";
+    std::string fileName = "tetrahedronMesh0.4.off";
     
     TetrahedronMesh *mesh=new TetrahedronMesh;
     mesh->read_off(read_path + fileName);    

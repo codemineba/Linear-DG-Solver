@@ -1,5 +1,5 @@
-#ifndef _LINEAR_DG_SOLVER_2D_CYCLE_BOUNDARY_H_
-#define _LINEAR_DG_SOLVER_2D_CYCLE_BOUNDARY_H_
+#ifndef _LINEAR_DG_SOLVER_3D_CYCLE_BOUNDARY_H_
+#define _LINEAR_DG_SOLVER_3D_CYCLE_BOUNDARY_H_
 
 
 #include "LinearDGSolver3D.h"
@@ -19,7 +19,7 @@ public:
         }
 
     ~LinearDGSolver_3D_CycleBoundary() override{
-        delete periodic_boundary_;
+        delete[] periodic_boundary_;
     }
     
     // 计算周期边界信息
@@ -35,9 +35,9 @@ public:
     double computeL2ErrorOfRho();
 
     // 输出日志信息
-    std::string LogMessage();
+    std::string LogMessage()override;
 
 };
 
 
-#endif // _LINEAR_DG_SOLVER_2D_CYCLE_BOUNDARY_H_
+#endif // _LINEAR_DG_SOLVER_3D_CYCLE_BOUNDARY_H_

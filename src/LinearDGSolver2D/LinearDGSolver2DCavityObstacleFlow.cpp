@@ -50,7 +50,7 @@ void LinearDGSolver_2D_CavityObstacleFlow::computeNumericalFluxOnBoundary(unsign
     unsigned long idx_edge = tri_edge_conn[ie][ik];
 
     // 外法向量
-    double normal[dim_];
+    double normal[2];
     normal[0] = outerNormal_[0][ik*3+ie];
     normal[1] = outerNormal_[1][ik*3+ie];
 

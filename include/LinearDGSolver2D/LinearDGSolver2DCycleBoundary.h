@@ -19,7 +19,7 @@ public:
         }
 
     ~LinearDGSolver_2D_CycleBoundary() override{
-        delete periodic_boundary_;
+        delete[] periodic_boundary_;
     }
     
     // 计算周期边界信息

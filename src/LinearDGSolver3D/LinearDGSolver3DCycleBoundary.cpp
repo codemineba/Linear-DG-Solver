@@ -56,13 +56,13 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
         used_times++;
 
         // 边界上的三个积分点
-        double v1[dim_] = {barx_[0][nBarx_*bdy], barx_[1][nBarx_*bdy], barx_[2][nBarx_*bdy]};
-        double v2[dim_] = {barx_[0][nBarx_*bdy+1], barx_[1][nBarx_*bdy+1], barx_[2][nBarx_*bdy+1]};
-        double v3[dim_] = {barx_[0][nBarx_*bdy+2], barx_[1][nBarx_*bdy+2], barx_[2][nBarx_*bdy+2]};
+        double v1[3] = {barx_[0][nBarx_*bdy], barx_[1][nBarx_*bdy], barx_[2][nBarx_*bdy]};
+        double v2[3] = {barx_[0][nBarx_*bdy+1], barx_[1][nBarx_*bdy+1], barx_[2][nBarx_*bdy+1]};
+        double v3[3] = {barx_[0][nBarx_*bdy+2], barx_[1][nBarx_*bdy+2], barx_[2][nBarx_*bdy+2]};
         // 对应边界上的三个积分点
-        double v1_[dim_] = {barx_[0][nBarx_*bdy_], barx_[1][nBarx_*bdy_], barx_[2][nBarx_*bdy_]};
-        double v2_[dim_] = {barx_[0][nBarx_*bdy_+1], barx_[1][nBarx_*bdy_+1], barx_[2][nBarx_*bdy_+1]};
-        double v3_[dim_] = {barx_[0][nBarx_*bdy_+2], barx_[1][nBarx_*bdy_+2], barx_[2][nBarx_*bdy_+2]};
+        double v1_[3] = {barx_[0][nBarx_*bdy_], barx_[1][nBarx_*bdy_], barx_[2][nBarx_*bdy_]};
+        double v2_[3] = {barx_[0][nBarx_*bdy_+1], barx_[1][nBarx_*bdy_+1], barx_[2][nBarx_*bdy_+1]};
+        double v3_[3] = {barx_[0][nBarx_*bdy_+2], barx_[1][nBarx_*bdy_+2], barx_[2][nBarx_*bdy_+2]};
 
         
         int idx1 = -1, idx2 = -1;   // 初始化索引
@@ -82,9 +82,6 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
         bool adjust=true;
         if (is_almost_equal(v1_2D_, v1_2D, 2) && is_almost_equal(v2_2D_, v2_2D, 2) && is_almost_equal(v3_2D_, v3_2D, 2)) {
             indices[0] = 0; indices[1] = 1; indices[2] = 2; adjust=false;  // 该情况无需调整
-            // std::cout<<v1[0]<<' '<<v1[1]<<' '<<v1[2]<<std::endl;
-            // std::cout<<v1_[0]<<' '<<v1_[1]<<' '<<v1_[2]<<std::endl;
-            // std::cout<<std::endl;
         } 
         else if (is_almost_equal(v1_2D_, v1_2D, 2) && is_almost_equal(v2_2D_, v3_2D, 2) && is_almost_equal(v3_2D_, v2_2D, 2)) {
             indices[0] = 0; indices[1] = 2; indices[2] = 1;
@@ -115,13 +112,13 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
             unsigned long face_tetra = nSide_*ik+order;
 
             // 临时变量存储排序后的 barx_ 和 phi_barx_ 的值
-            double temp_barx[dim_][nBarx_];  
+            double temp_barx[3][nBarx_];  
             double temp_phi_barx[nPhi_][nBarx_]; 
 
             // 读取原数组的值到临时变量，并将排序后的值写回原数组
             for (int j = 0; j < nBarx_; ++j) {  // 遍历每个点
                 unsigned long original_index = indices[j];  // 排序前的位置索引
-                for (int n = 0; n < dim_; ++n) {  
+                for (int n = 0; n < 3; ++n) {  
                     temp_barx[n][j] = barx_[n][nBarx_ * bdy_ + original_index];
                 }
                 for (int n = 0; n < nPhi_; ++n) { 
@@ -130,7 +127,7 @@ void LinearDGSolver_3D_CycleBoundary::computePeriodicBoundaryInfo(){
             }
             // 交换ik面的积分点的顺序
             for (int j = 0; j < nBarx_; ++j) {  // 遍历每个点
-                for (int n = 0; n < dim_; ++n) { 
+                for (int n = 0; n < 3; ++n) { 
                     barx_[n][nBarx_ * bdy_ + j] = temp_barx[n][j];
                 }
                 for (int n = 0; n < nPhi_; ++n) {
@@ -193,7 +190,7 @@ void LinearDGSolver_3D_CycleBoundary::computeNumericalFluxOnBoundary(unsigned lo
     unsigned long idx_edge = tet_face_conn[ie][ik];
 
     // 外法向量
-    double normal[dim_];
+    double normal[3];
     normal[0] = outerNormal_[0][ik*nSide_+ie];
     normal[1] = outerNormal_[1][ik*nSide_+ie];
     normal[2] = outerNormal_[2][ik*nSide_+ie];
@@ -232,7 +229,7 @@ double LinearDGSolver_3D_CycleBoundary::computeL2ErrorOfRho(){
     double *z=tetmesh_->z_coord();
 
     // 密度准确解
-    double* exactSolution = new double[nVertex];
+    double exactSolution[nVertex];
     for (unsigned long i =0; i<nVertex; i++){
         exactSolution[i] = 1.0 + 0.2 * sin(PI*(x[i] + y[i] + z[i] - timePoint_)); 
     }

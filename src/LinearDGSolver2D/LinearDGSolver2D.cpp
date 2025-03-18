@@ -14,10 +14,10 @@ void LinearDGSolver_2D::phi(unsigned long ik, double x, double y, double *var, d
     double y0 = y_[tri[0][ik]];
     double y1 = y_[tri[1][ik]];  
     double y2 = y_[tri[2][ik]];
-    double v0[dim_] = {x0, y0};
-    double v1[dim_] = {x1, y1};
-    double v2[dim_] = {x2, y2};
-    double v[dim_]  = {x, y};
+    double v0[2] = {x0, y0};
+    double v1[2] = {x1, y1};
+    double v2[2] = {x2, y2};
+    double v[2]  = {x, y};
 
     // 面积坐标
     double s=directed_2D_triangle_area(v0, v1, v2);
@@ -31,12 +31,12 @@ void LinearDGSolver_2D::phi(unsigned long ik, double x, double y, double *var, d
     var[2] = 1 - 2 * (1 - xi - eta);
 
     if (var_x!=nullptr && var_y!=nullptr){
-        double s0_v0[dim_], s1_v1[dim_];   //关于v0的s0梯度 和 关于v1的s1梯度
+        double s0_v0[2], s1_v1[2];   //关于v0的s0梯度 和 关于v1的s1梯度
         directed_2D_triangle_area_gradient(v, v1, v2, 0, s0_v0);
         directed_2D_triangle_area_gradient(v0, v, v2, 1, s1_v1);
 
-        double tem_s_v[dim_][nPhi_];
-        for(int i=0; i<dim_; i++){
+        double tem_s_v[2][nPhi_];
+        for(int i=0; i<2; i++){
             tem_s_v[i][0]=-2*s0_v0[i]/s;
             tem_s_v[i][1]=-2*s1_v1[i]/s;
             tem_s_v[i][2]=(2*s0_v0[i]+2*s1_v1[i])/s;
@@ -88,7 +88,7 @@ void LinearDGSolver_2D::flux(double* u, double f[2][4]){
     double rho=u[0];   // 密度
     double v1=u[1]/u[0];  // x方向速度
     double v2=u[2]/u[0];  // y方向速度
-    double v[dim_]={v1, v2}; 
+    double v[2]={v1, v2}; 
     double E=u[3];  // 能量
     double p =PRESSURE(E, rho, v); // 压强
     
@@ -100,7 +100,7 @@ void LinearDGSolver_2D::flux(double* u, double f[2][4]){
 }
 
 void LinearDGSolver_2D::numerical_flux(double* u1, double *u2, double *normal, double* f){
-    double fu1[dim_][4], fu2[dim_][4], fn[nVars_];  // 第二维必须指定数字才能传入函数  nVars_=4 
+    double fu1[2][4], fu2[2][4], fn[nVars_];  // 第二维必须指定数字才能传入函数  nVars_=4 
     flux(u1, fu1);
     flux(u2, fu2);
     for(int i=0; i<nVars_; i++){
@@ -108,13 +108,13 @@ void LinearDGSolver_2D::numerical_flux(double* u1, double *u2, double *normal, d
     }
 
     // 计算谱半径
-    double rho1=u1[0], E1=u1[3], v1[dim_]={u1[1]/u1[0], u1[2]/u1[0]};
+    double rho1=u1[0], E1=u1[3], v1[2]={u1[1]/u1[0], u1[2]/u1[0]};
     double cs1 =SOUND_SPEED(PRESSURE(E1, rho1, v1), rho1);
-    double lambda_u1 = fabs(dot(v1, normal, dim_))+cs1;
+    double lambda_u1 = fabs(dot(v1, normal, 2))+cs1;
 
-    double rho2=u2[0], E2=u2[3], v2[dim_]={u2[1]/u2[0], u2[2]/u2[0]};
+    double rho2=u2[0], E2=u2[3], v2[2]={u2[1]/u2[0], u2[2]/u2[0]};
     double cs2 =SOUND_SPEED(PRESSURE(E2, rho2, v2), rho2);
-    double lambda_u2 = fabs(dot(v2, normal, dim_))+cs2;
+    double lambda_u2 = fabs(dot(v2, normal, 2))+cs2;
 
     double alpha= lambda_u1 > lambda_u2 ? lambda_u1 : lambda_u2;
     
@@ -135,9 +135,9 @@ void LinearDGSolver_2D::computeElementProperties(){
     // 计算面积
     for (unsigned long i=0; i<nElement; ++i){
 
-        double v0[dim_]={x[tri[0][i]], y[tri[0][i]]};
-        double v1[dim_]={x[tri[1][i]], y[tri[1][i]]};
-        double v2[dim_]={x[tri[2][i]], y[tri[2][i]]};
+        double v0[2]={x[tri[0][i]], y[tri[0][i]]};
+        double v1[2]={x[tri[1][i]], y[tri[1][i]]};
+        double v2[2]={x[tri[2][i]], y[tri[2][i]]};
 
         area_[i]=fabs(directed_2D_triangle_area(v0, v1, v2));
     }
@@ -250,7 +250,7 @@ void LinearDGSolver_2D::computeInitialData() {
 
 
 void LinearDGSolver_2D::computeFluxOnElement(unsigned long ik, double** u, double f[2][12]){
-    double fu[dim_][4]; // 用于储存该边的f(u)通量
+    double fu[2][4]; // 用于储存该边的f(u)通量
     double ui[nVars_];  // 储存该边的物理量
     for(int j=0; j<nPhi_; j++){  // 三个基函数
         for(int n=0; n<nVars_; n++){
@@ -258,7 +258,7 @@ void LinearDGSolver_2D::computeFluxOnElement(unsigned long ik, double** u, doubl
         }
         flux(ui, fu);  // 计算该边通量
         // 将该边通量储存到f中 f即储存了一个单元三条边的通量
-        for(int k=0; k<dim_; k++){
+        for(int k=0; k<2; k++){
             for(int n=0; n<nVars_; n++){
                 f[k][j*nVars_+n] = fu[k][n];
             }
@@ -291,7 +291,7 @@ void LinearDGSolver_2D::computeNumericalFluxOnInteriorEdge(unsigned long ik, uns
     unsigned long idx_edge = tri_edge_conn[ie][ik];    
 
     // 外法向量
-    double normal[dim_];
+    double normal[2];
     normal[0] = outerNormal_[0][ik*nSide_+ie];
     normal[1] = outerNormal_[1][ik*nSide_+ie];
 
@@ -333,7 +333,7 @@ void LinearDGSolver_2D::computeNumericalFluxOnElement(unsigned long ik, double**
     unsigned long** edgeInfo = trimesh_->edge_info();
     unsigned long **tri_edge_conn_ = trimesh_->tri_edge_connection();
     
-    double flux[dim_][4];
+    double flux[2][4];
     for(int i=0; i<nSide_; i++){  // 三条边
         unsigned long ie = tri_edge_conn_[i][ik];  // 该边索引
         // 判断该边是否是边界
@@ -364,7 +364,7 @@ void LinearDGSolver_2D::computeSpaceDiscretization(double** u, double**f) {
             f[n][j]=0.0;
         }
     }
-    double fu[dim_][12], flux[nBarx_*nSide_][4];
+    double fu[2][12], flux[nBarx_*nSide_][4];
     for (unsigned long ik=0; ik<nElement; ik++){  // 单元数
         computeFluxOnElement(ik, u, fu);  // 计算k单元的f(u)通量
         computeNumericalFluxOnElement(ik, u, flux);  // 计算k单元的数值通量
@@ -391,21 +391,23 @@ void LinearDGSolver_2D::computeSpaceDiscretization(double** u, double**f) {
 
 double LinearDGSolver_2D::computeTimeStep(double** u){
     
-    double dm[nElement]={0}; 
+    double *dm=new double[nElement];
+    for (unsigned long j=0; j<nElement; ++j){
+        dm[j]=0;
+    }
 
     for(unsigned long i=0; i<nElement; i++){
         double u_average[nVars_];
         for(int j=0; j<nVars_; j++){
             u_average[j] = (u[j][i*nPhi_] + u[j][i*nPhi_+1] + u[j][i*nPhi_+2]) / nPhi_;
         }
-        double rho=u_average[0], E=u_average[3], v[dim_]={u_average[1]/u_average[0], u_average[2]/u_average[0]};
+        double rho=u_average[0], E=u_average[3], v[2]={u_average[1]/u_average[0], u_average[2]/u_average[0]};
         double cs =SOUND_SPEED(PRESSURE(E, rho, v), rho);
-        dm[i] = (l2_norm(v, dim_) + cs) * (perimeter_[i] / area_[i]);
+        dm[i] = (l2_norm(v, 2) + cs) * (perimeter_[i] / area_[i]);
     }
 
-    int n = sizeof(dm) / sizeof(dm[0]); // 数组大小 (nElement)
-    double max_dm = *std::max_element(dm, dm + n);  // 寻找最大值 
-
+    double max_dm = *std::max_element(dm, dm + nElement);  // 寻找最大值 
+    delete []dm;
     return CFL/max_dm;
     
 }
@@ -641,7 +643,7 @@ void LinearDGSolver_2D::outputTecPlotDataFile(const std::string &fname, double t
         double rho = uh[0][i];
         double vx = uh[1][i] / rho;
         double vy = uh[2][i] / rho;
-        double v[dim_] = {vx, vy};
+        double v[2] = {vx, vy};
         double E = uh[3][i];
         double p = PRESSURE(E, rho, v);
 
@@ -772,7 +774,7 @@ void LinearDGSolver_2D::outputVTKDataFile(const std::string &fname, double time_
         double rho = uh[0][i];
         double vx = uh[1][i] / rho;
         double vy = uh[2][i] / rho;
-        double v[dim_] = {vx, vy};
+        double v[2] = {vx, vy};
         double E = uh[3][i];
         double p = PRESSURE(E, rho, v); // p 的计算
         output << std::setprecision(15) << std::setw(20) << p << std::endl;

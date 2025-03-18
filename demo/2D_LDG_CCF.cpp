@@ -8,7 +8,7 @@ int main() {
     
     std::string read_path = std::string(SOURCE_DIR) + "/data/2D/CavityCylinderFlow/";
     std::string write_path = std::string(SOURCE_DIR) + "/result/2D/CavityCylinderFlow/";
-    std::string fileName = "rectangle_with_center_circle0.05.off";
+    std::string fileName = "rectangle_with_center_circle0.1.off";
 
     TriangleMesh *mesh=new TriangleMesh;
     mesh->read_off(read_path + fileName);
