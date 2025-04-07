@@ -8,7 +8,7 @@ file = "rectangle_with_center_circle0.1.off"
 mesh.read_off(path+file)
 mesh.collect_edges()
 
-DGSolver = PY_DG_2D.LinearDGSolver_2D_CycleBoundary(mesh)
+DGSolver = PY_DG_2D.LinearDGSolver_2D_CavityCylinderFlow(mesh)
 DGSolver.computeTimeDiscretization(2)
 
 print('iter over!')
