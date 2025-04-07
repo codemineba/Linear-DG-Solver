@@ -90,6 +90,12 @@ void LinearDGSolver_2D_CavityObstacleFlow::computeNumericalFluxOnBoundary(unsign
 // 计算Rho的L2范数
 double LinearDGSolver_2D_CavityObstacleFlow::computeL2NormOfRho(){
 
+    double rho[nVertex];
+
+    // 密度数值解
+    int idx = 0;
+    for(unsigned long i=0; i<nVertex; i++){ rho[i] = vertexFieldValues[i+idx*nVertex]; }
+
     double L2Result = l2_norm(rho, nVertex)/nVertex;
 
     return L2Result;

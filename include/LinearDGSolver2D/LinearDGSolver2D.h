@@ -40,7 +40,7 @@ protected:
     double *edge_len_;          // 边的长度，用于计算外法向量
     double *perimeter_;         // 单元周长
     double *area_;              // 单元面积
-    double *rho;
+    double *vertexFieldValues;
 
 
     unsigned long nElement;     // 单元数
@@ -87,9 +87,9 @@ public:
             phi_barx_[i] = new double[dof_*nBarx_];  // 高斯点基函数值
             phi_vec_[i] = new double[nSide_];        // 顶点基函数值
         }
-        rho = new double[nVertex];  // 为绘制实时渲染记录变量
-        for(unsigned long i=0; i<nVertex; i++){
-            rho[i] = 0.0;
+        vertexFieldValues = new double[nVertex*5];  // 为绘制实时渲染记录变量
+        for(unsigned long i=0; i<nVertex*5; i++){
+            vertexFieldValues[i] = 0.0;
         }
 
         computeElementProperties();    // 计算单元属性 (包括: 中点,高斯点,边长,周长,面积)
@@ -118,13 +118,13 @@ public:
             delete[] u_[i];
             delete[] u0_[i];
         }
-        delete[] rho;
+        delete[] vertexFieldValues;
         delete[] times_point_save_;
     }
 
 
-    double* getVar() {return rho;}
-    void setVar(double* var) { rho = var;}
+    double* getRenderingData() {return vertexFieldValues;}
+    unsigned long getNRenderingData() {return nVertex*5;}
 
     // 基函数及其导数
     void phi(unsigned long ik, double x, double y, double *var, double *var_x=nullptr, double *var_y=nullptr);

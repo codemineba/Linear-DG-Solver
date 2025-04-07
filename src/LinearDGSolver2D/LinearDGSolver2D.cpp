@@ -587,7 +587,35 @@ void LinearDGSolver_2D::NumericalSolutionOnVertex(double** u, double** var){
 
 // 用于画图
 void LinearDGSolver_2D::SynchronizationUpdate(double** u){
-    NumericalSolutionOnVertex(u, 0, rho);
+
+    // 用于保留单元顶点上的数值解
+    double* uh[nVars_];
+    for (int i=0; i<nVars_; i++){
+        uh[i]=new double[nVertex];
+        for (unsigned long j=0; j<nVertex; j++){
+            uh[i][j]=0.0;
+        }
+    }
+    NumericalSolutionOnVertex(u, uh);
+
+    for (unsigned long i = 0; i < nVertex; i++) {
+        double rho = uh[0][i];
+        double vx = uh[1][i] / rho;
+        double vy = uh[2][i] / rho;
+        double v[2] = {vx, vy};
+        double E = uh[3][i];
+        double p = PRESSURE(E, rho, v);
+        
+        vertexFieldValues[i] = rho;
+        vertexFieldValues[i+1*nVertex] = vx;
+        vertexFieldValues[i+2*nVertex] = vy;
+        vertexFieldValues[i+3*nVertex] = E;
+        vertexFieldValues[i+4*nVertex] = p;
+    }
+
+    for (int i = 0; i < nVars_; i++){
+        delete[] uh[i];
+    }
 }
 
     

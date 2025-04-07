@@ -42,7 +42,7 @@ protected:
     double *face_area_;         // 面的面积，用于计算外法向量
     double *sufacearea_;        // 单元表面积
     double *volume_;            // 单元体积 
-    double *rho;
+    double *vertexFieldValues;
 
 
     unsigned long nElement;     // 单元数
@@ -91,9 +91,9 @@ public:
             phi_barx_[i] = new double[dof_*nBarx_];  // barx的基函数值
             phi_vec_[i] = new double[nCorner_];        // 顶点基函数值
         }
-        rho = new double[nVertex];  // 为绘制实时渲染记录变量
-        for(unsigned long i=0; i<nVertex; i++){
-            rho[i] = 0.0;
+        vertexFieldValues = new double[nVertex*6];  // 为绘制实时渲染记录变量
+        for(unsigned long i=0; i<nVertex*6; i++){
+            vertexFieldValues[i] = 0.0;
         }
         computeElementProperties();    // 计算单元属性 (包括: 内部求积点,边界求积点,面积,表面积,体积)
         computeOuterNormal();          // 计算外法向量
@@ -125,13 +125,13 @@ public:
             delete[] u_[i];
             delete[] u0_[i];
         }
-        delete[] rho;
+        delete[] vertexFieldValues;
         delete[] times_point_save_;
     }
 
 
-    double* getVar() {return rho;}
-    void setVar(double* var) { rho = var;}
+    double* getRenderingData() {return vertexFieldValues;}
+    unsigned long getNRenderingData() {return nVertex*6;}
 
     // 基函数及其导数
     void phi(unsigned long ik, double x, double y, double z, double *var, double *var_x=nullptr, double *var_y=nullptr, double *var_z=nullptr);

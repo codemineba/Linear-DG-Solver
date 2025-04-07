@@ -33,6 +33,7 @@ doc/DG_3D/*.out
 
 # Compiled Dynamic libraries
 *.so
+*.pyd
 *.dylib
 *.dll
 

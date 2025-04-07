@@ -116,6 +116,11 @@ double LinearDGSolver_2D_CycleBoundary::computeL2ErrorOfRho(){
     
     double *x=trimesh_->x_coord();
     double *y=trimesh_->y_coord();
+    double rho[nVertex];
+
+    // 密度数值解
+    int idx = 0;
+    for(unsigned long i=0; i<nVertex; i++){ rho[i] = vertexFieldValues[i+idx*nVertex]; }
 
     // 密度准确解
     double exactSolution[nVertex];
