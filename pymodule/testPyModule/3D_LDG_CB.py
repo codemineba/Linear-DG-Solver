@@ -2,7 +2,7 @@ import PY_DG_3D
 
 mesh = PY_DG_3D.TetrahedronMesh()
 
-path = '../../data/3D/CycleBoundary'
+path = '../../data/3D/CycleBoundary/'
 file = "tetrahedronMesh0.1.off"
 
 mesh.read_off(path+file)

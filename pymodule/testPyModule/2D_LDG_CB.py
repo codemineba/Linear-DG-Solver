@@ -2,7 +2,7 @@ import PY_DG_2D
 
 mesh = PY_DG_2D.TriangleMesh()
 
-path = '../../data/2D/CycleBoundary'
+path = '../../data/2D/CycleBoundary/'
 file = "triangleMesh0.1.off"
 
 mesh.read_off(path+file)
