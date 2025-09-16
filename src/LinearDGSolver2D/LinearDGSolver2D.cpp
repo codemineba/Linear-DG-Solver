@@ -810,6 +810,8 @@ void LinearDGSolver_2D::outputVTKDataFile(const std::string &fname, double time_
 
     output.close();
 
+    std::cout << "successfully written to " << fname << std::endl;
+
     // 释放内存
     for (int i = 0; i < nVars_; i++){
         delete[] uh[i];

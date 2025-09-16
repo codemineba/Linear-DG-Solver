@@ -737,6 +737,7 @@ void LinearDGSolver_3D::outputTecPlotDataFile(const std::string &fname, double t
 void LinearDGSolver_3D::outputVTKDataFile(const std::string &fname, double time_point) {
     double *x = tetmesh_->x_coord();
     double *y = tetmesh_->y_coord();
+    double *z = tetmesh_->z_coord();
     unsigned long **conn = tetmesh_->tetrahedron();
 
     //寻找记录的保存时间点
@@ -777,7 +778,7 @@ void LinearDGSolver_3D::outputVTKDataFile(const std::string &fname, double time_
 
     std::ofstream output(fname);
     output << "# vtk DataFile Version 3.0" << std::endl;
-    output << "Triangular mesh" << std::endl;
+    output << "Tetrahedral mesh" << std::endl;
     output << "ASCII" << std::endl;
     output << "DATASET UNSTRUCTURED_GRID" << std::endl;
 
@@ -785,22 +786,23 @@ void LinearDGSolver_3D::outputVTKDataFile(const std::string &fname, double time_
     output << "POINTS " << nVertex << " double" << std::endl;
     for (unsigned long i = 0; i < nVertex; i++) {
         output << std::setprecision(15) << std::setw(20) << x[i] << " ";
-        output << std::setprecision(15) << std::setw(20) << y[i] << " 0.0" << std::endl; // z 方向设为 0.0
+        output << std::setprecision(15) << std::setw(20) << y[i] << " ";
+        output << std::setprecision(15) << std::setw(20) << z[i] << std::endl;
     }
 
-    // 写入单元连接信息（三角形）
-    output << "CELLS " << nElement << " " << nElement * 4 << std::endl; // 每个三角形有 3 个顶点，行开头有个计数 3
+    // 写入单元连接信息（四面体）
+    output << "CELLS " << nElement << " " << nElement * 5 << std::endl; // 每个四面体有 4 个顶点，行开头有个计数 4
     for (unsigned long i = 0; i < nElement; i++) {
-        output << "3 " << conn[0][i] << " " << conn[1][i] << " " << conn[2][i] << std::endl;
+        output << "4 " << conn[0][i] << " " << conn[1][i] << " " << conn[2][i] << " " << conn[3][i] << std::endl;
     }
 
-    // 写入单元类型（三角形类型在 VTK 中为 5）
+    // 写入单元类型（四面体类型在 VTK 中为 10）
     output << "CELL_TYPES " << nElement << std::endl;
     for (unsigned long i = 0; i < nElement; i++) {
-        output << "5" << std::endl; // VTK_TRIANGLE 类型对应编号为 5
+        output << "10" << std::endl; // VTK_TETRA 类型对应编号为 10
     }
 
-    // 写入顶点上的标量数据 rho, vx, vy, E 和 p
+    // 写入顶点上的标量数据 rho, vx, vy, vz, E 和 p
     output << "POINT_DATA " << nVertex << std::endl;
 
     // 写入 rho 数据
@@ -811,22 +813,23 @@ void LinearDGSolver_3D::outputVTKDataFile(const std::string &fname, double time_
         output << std::setprecision(15) << std::setw(20) << rho << std::endl; // rho
     }
 
-    // 写入速度向量数据 (vx, vy)
+    // 写入速度向量数据 (vx, vy, vz)
     output << "VECTORS velocity double" << std::endl;
     for (unsigned long i = 0; i < nVertex; i++) {
         double rho = uh[0][i];
         double vx = uh[1][i] / rho; // vx
         double vy = uh[2][i] / rho; // vy
+        double vz = uh[3][i] / rho; // vy
         output << std::setprecision(15) << std::setw(20) << vx << " ";
         output << std::setprecision(15) << std::setw(20) << vy << " ";
-        output << "0.0" << std::endl; // z 方向速度为 0.0
+        output << std::setprecision(15) << std::setw(20) << vz << std::endl;
     }
 
     // 写入能量数据 E
     output << "SCALARS E double 1" << std::endl;
     output << "LOOKUP_TABLE default" << std::endl;
     for (unsigned long i = 0; i < nVertex; i++) {
-        double E = uh[3][i];
+        double E = uh[4][i];
         output << std::setprecision(15) << std::setw(20) << E << std::endl; // E
     }
 
@@ -846,9 +849,12 @@ void LinearDGSolver_3D::outputVTKDataFile(const std::string &fname, double time_
 
     output.close();
 
+    std::cout << "successfully written to " << fname << std::endl;
+
     // 释放内存
     for (int i = 0; i < nVars_; i++){
         delete[] uh[i];
         delete[] uj[i];
     }
 }
+
